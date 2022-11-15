@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "target": "esnext",
+    "module": "commonjs",
+    "moduleResolution": "nodenext",
+
+    "newLine": "crlf",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "sourceMap": false,
+    "declaration": false,
+    "declarationMap": false,
+    "esModuleInterop": true,
+    "downlevelIteration": false,
+    "emitDeclarationOnly": false,
+    "importsNotUsedAsValues": "remove",
+
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "useUnknownInCatchVariables": false,
+    "noPropertyAccessFromIndexSignature": false
+  },
+  "include": ["./src"]
+}

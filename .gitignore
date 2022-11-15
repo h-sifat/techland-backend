@@ -1,0 +1,6 @@
+dist/
+trash/
+coverage/
+node_modules/
+
+trash.*
