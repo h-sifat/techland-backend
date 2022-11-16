@@ -6,7 +6,7 @@ interface MakeZodErrorMapForObjectSchema_Argument {
   objectName: string;
 }
 
-export function makeZodErrorMapForObjectSchema(
+export function makeZodErrorMap(
   arg: MakeZodErrorMapForObjectSchema_Argument
 ): ZodErrorMap {
   const { labels, objectName = {} } = arg;
@@ -19,7 +19,7 @@ export function makeZodErrorMapForObjectSchema(
     switch (error.code) {
       case ZodIssueCode.invalid_type: {
         const message =
-          `Expected "${label}" to be ${error.expected}` +
+          `Expected ${label} to be ${error.expected}` +
           ` but received ${error.received}`;
         return { message };
       }
