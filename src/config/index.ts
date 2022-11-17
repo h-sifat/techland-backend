@@ -4,6 +4,18 @@ interface EntityConfig {
   address: AddressConfigInterface;
 }
 
+interface Config {
+  BCRYPT_SALT_ROUNDS: number;
+}
+
+const config: Config = {
+  BCRYPT_SALT_ROUNDS: 10,
+};
+
+export function getConfig(): Readonly<Config> {
+  return Object.freeze({ ...config });
+}
+
 const entityConfig: EntityConfig = {
   address: {
     phoneLength: 15,
@@ -19,5 +31,7 @@ export function getEntityConfig<entity extends keyof EntityConfig>(arg: {
 }): EntityConfig[entity] {
   const { entity } = arg;
 
-  return Object.freeze({ ...entityConfig[entity] });
+  return Object.freeze({
+    ...entityConfig[entity],
+  }) as unknown as EntityConfig[entity];
 }

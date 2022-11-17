@@ -16,6 +16,7 @@
   "author": "Muhammad Sifat Hossain",
   "license": "MIT",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/jest": "^29.2.3",
     "@types/lodash": "^4.14.189",
     "@types/node": "^18.11.9",
@@ -23,6 +24,7 @@
     "ts-jest": "^29.0.3"
   },
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "cuid": "^2.1.8",
     "lodash": "^4.17.21",
     "zod": "^3.19.1"
