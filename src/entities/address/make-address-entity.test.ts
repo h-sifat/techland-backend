@@ -1,4 +1,4 @@
-import { createHash, makeId } from "../../common/util/index";
+import { createMD5Hash, makeId } from "../../common/util/index";
 import { AddressConfigInterface } from "./interface";
 import { makeAddressEntity, MakeAddress_Argument } from "./make-address-entity";
 
@@ -13,7 +13,7 @@ const config: AddressConfigInterface = Object.freeze({
 const Address = makeAddressEntity({
   config,
   makeId,
-  createHash,
+  createHash: createMD5Hash,
   currentTimeMs: () => Date.now(),
 });
 
