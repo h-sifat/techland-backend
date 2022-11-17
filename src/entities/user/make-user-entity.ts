@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { makeZodErrorMap } from "../../common/util/zod";
+import {
+  isNever,
+  makeZodErrorMap,
+  MissingOrUnknownPropertiesInSchema,
+} from "../../common/util/zod";
 
 import {
   ACCOUNT_STATUSES,
@@ -42,7 +46,7 @@ export function makeUserEntity(
   const { makeId, config, currentTimeMs, hashPassword } = factoryArg;
 
   // ========================[Validation Schemas]==========================
-  const makeArgumentSchema = z
+  const MakeArgumentSchema = z
     .object({
       password: z
         .string()
@@ -53,17 +57,32 @@ export function makeUserEntity(
     })
     .strict();
 
-  const editArgumentSchema = makeArgumentSchema
-    .merge(
-      z.object({
-        addresses: z.array(z.string().min(1)),
-        accountStatus: z.nativeEnum(ACCOUNT_STATUSES),
-      })
-    )
-    .partial()
-    .strict();
+  {
+    type shouldBeNever = MissingOrUnknownPropertiesInSchema<
+      z.infer<typeof MakeArgumentSchema>,
+      MakeUser_Argument
+    >;
+    isNever<shouldBeNever>();
+  }
 
-  const userSchema = z
+  const ChangesSchema = z
+    .object({
+      addresses: z.array(z.string().min(1)),
+      accountStatus: z.nativeEnum(ACCOUNT_STATUSES),
+    })
+    .strict()
+    .partial()
+    .merge(MakeArgumentSchema.strict().partial());
+
+  {
+    type shouldBeNever = MissingOrUnknownPropertiesInSchema<
+      z.infer<typeof ChangesSchema>,
+      EditUser_Argument["changes"]
+    >;
+    isNever<shouldBeNever>();
+  }
+
+  const UserSchema = z
     .object({
       id: z.string().min(1),
       password: z.string().min(1),
@@ -76,13 +95,11 @@ export function makeUserEntity(
     .strict();
 
   {
-    // exhaustive check to make sure that userSchema contains all the
-    // properties of UserPrivateInterface and no unknown properties.
-    type UserSchema = z.infer<typeof userSchema>;
-    type shouldBeEmptyObject = Omit<UserPrivateInterface, keyof UserSchema> &
-      Omit<UserSchema, keyof UserPrivateInterface>;
-
-    const x: shouldBeEmptyObject = {};
+    type shouldBeNever = MissingOrUnknownPropertiesInSchema<
+      z.infer<typeof UserSchema>,
+      UserPrivateInterface
+    >;
+    isNever<shouldBeNever>();
   }
 
   const errorMap = makeZodErrorMap({ objectName: "User" });
@@ -91,7 +108,7 @@ export function makeUserEntity(
   async function make(
     arg: MakeUser_Argument
   ): Promise<Readonly<UserPrivateInterface>> {
-    const result = makeArgumentSchema.safeParse(arg, { errorMap });
+    const result = MakeArgumentSchema.safeParse(arg, { errorMap });
     if (!result.success) throw result.error.flatten();
 
     const user: Readonly<UserPrivateInterface> = Object.freeze({
@@ -111,7 +128,7 @@ export function makeUserEntity(
   ): Promise<Readonly<UserPrivateInterface>> {
     const { changes: unValidatedChanges } = arg;
 
-    const result = editArgumentSchema.safeParse(unValidatedChanges, {
+    const result = ChangesSchema.safeParse(unValidatedChanges, {
       errorMap,
     });
     if (!result.success) throw result.error.flatten();
@@ -132,7 +149,7 @@ export function makeUserEntity(
   }
 
   function validate(user: unknown): asserts user is UserPrivateInterface {
-    const result = userSchema.safeParse(user, { errorMap });
+    const result = UserSchema.safeParse(user, { errorMap });
     if (!result.success) throw result.error.flatten();
   }
 

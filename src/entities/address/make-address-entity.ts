@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  isNever,
+  makeZodErrorMap,
+  MissingOrUnknownPropertiesInSchema,
+} from "../../common/util/zod";
 
 import type {
   AddressConfigInterface,
@@ -6,7 +11,6 @@ import type {
   AddressPrivateInterface,
 } from "./interface";
 import type { MakeId } from "../../common/interface";
-import { makeZodErrorMap } from "../../common/util/zod";
 
 export type MakeAddress_Argument = Omit<
   AddressPublicInterface,
@@ -35,7 +39,7 @@ export function makeAddressEntity(
   const { config, createHash, makeId, currentTimeMs } = factoryArg;
 
   // ===================== Validation Schemas =========================
-  const makeAddressArgSchema = z
+  const MakeArgumentSchema = z
     .object({
       userId: z.string().trim().min(1),
       phone: z.string().trim().length(config.phoneLength),
@@ -46,47 +50,51 @@ export function makeAddressEntity(
     })
     .strict();
 
-  const editAddressArgSchema = makeAddressArgSchema
-    .omit({ userId: true })
-    .partial();
+  {
+    type shouldBeNever = MissingOrUnknownPropertiesInSchema<
+      z.infer<typeof MakeArgumentSchema>,
+      MakeAddress_Argument
+    >;
+    isNever<shouldBeNever>();
+  }
 
-  const editArgumentSchemaErrorMap = makeZodErrorMap({
-    objectName: "editedAddress",
-  });
+  const ChangesSchema = MakeArgumentSchema.omit({
+    userId: true,
+  }).partial();
 
-  const fullAddressSchema = makeAddressArgSchema
-    .merge(
-      z.object({
-        isDeleted: z.boolean(),
-        id: z.string().trim().min(1),
-        hash: z.string().trim().min(1),
-        createdAt: z.number().positive().int(),
-      })
-    )
-    .strict()
+  const AddressSchema = z
+    .object({
+      isDeleted: z.boolean(),
+      id: z.string().trim().min(1),
+      hash: z.string().trim().min(1),
+      createdAt: z.number().positive().int(),
+    })
+    .merge(MakeArgumentSchema)
     .refine((address) => address.hash === generateHash(address), {
       path: ["hash"],
       message: `The address is invalid because the hash doesn't match.`,
     });
 
-  const addressSchemaErrorMap = makeZodErrorMap({
-    objectName: "Address",
-  });
+  {
+    type shouldBeNever = MissingOrUnknownPropertiesInSchema<
+      z.infer<typeof AddressSchema>,
+      AddressPrivateInterface
+    >;
+    isNever<shouldBeNever>();
+  }
+
+  const errorMap = makeZodErrorMap({ objectName: "Address" });
   // ===================== End of Validation Schemas =========================
 
   function validate(
     address: unknown
   ): asserts address is AddressPrivateInterface {
-    const result = fullAddressSchema.safeParse(address, {
-      errorMap: addressSchemaErrorMap,
-    });
+    const result = AddressSchema.safeParse(address, { errorMap });
     if (!result.success) throw result.error.flatten();
   }
 
   function make(arg: MakeAddress_Argument): Readonly<AddressPrivateInterface> {
-    const result = makeAddressArgSchema.safeParse(arg, {
-      errorMap: addressSchemaErrorMap,
-    });
+    const result = MakeArgumentSchema.safeParse(arg, { errorMap });
     if (!result.success) throw result.error.flatten();
 
     const address: Readonly<AddressPrivateInterface> = Object.freeze({
@@ -103,9 +111,7 @@ export function makeAddressEntity(
   function edit(arg: EditAddress_Argument): Readonly<AddressPrivateInterface> {
     const { address, changes: unValidatedChanges } = arg;
 
-    const result = editAddressArgSchema.safeParse(unValidatedChanges, {
-      errorMap: editArgumentSchemaErrorMap,
-    });
+    const result = ChangesSchema.safeParse(unValidatedChanges, { errorMap });
     if (!result.success) throw result.error.flatten();
 
     const changes = result.data;

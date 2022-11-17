@@ -60,3 +60,12 @@ function makeLabelFromPath(pathArray: (string | number)[]) {
 
   return label;
 }
+
+export type MissingOrUnknownPropertiesInSchema<
+  Schema extends object,
+  Object extends object
+> = keyof (Omit<Object, keyof Schema> & Omit<Schema, keyof Object>);
+
+// the _x parameter is not needed, but I've added
+// it to get rid of the unused "Type" hint
+export function isNever<Type extends never>(_x?: Type) {}
