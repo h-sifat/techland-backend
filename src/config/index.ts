@@ -1,6 +1,8 @@
+import type { UserConfigInterface } from "../entities/user/interface";
 import type { AddressConfigInterface } from "../entities/address/interface";
 
 interface EntityConfig {
+  user: UserConfigInterface;
   address: AddressConfigInterface;
 }
 
@@ -23,6 +25,11 @@ const entityConfig: EntityConfig = {
     maxCityLength: 50,
     maxStreetLength: 50,
     maxDistrictLength: 50,
+  },
+  user: {
+    MAX_NAME_LENGTH: 30,
+    MIN_PASSWORD_LENGTH: 8,
+    MAX_PASSWORD_LENGTH: 32,
   },
 };
 
