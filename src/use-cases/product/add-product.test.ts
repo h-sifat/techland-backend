@@ -1,7 +1,6 @@
 import { makeAddProduct } from "./add-product";
 import { sampleMakeProductArgument } from "../../../fixtures/product";
 import { Product } from "../../entities/product";
-import { EPP } from "../../common/util/epp";
 
 const database = Object.freeze({
   insert: jest.fn(),
