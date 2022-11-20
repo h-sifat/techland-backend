@@ -8,7 +8,7 @@
 
     "newLine": "crlf",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "sourceMap": false,
     "declaration": false,
     "declarationMap": false,
