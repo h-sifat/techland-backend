@@ -3,11 +3,11 @@ import {
   makeProductEntity,
   MakeProduct_Argument,
 } from "./make-product-entity";
+import { z } from "zod";
 import { inspect } from "util";
 import { PRICE_UNITS } from "./interface";
 import deepFreeze from "deep-freeze-strict";
 import { currentTimeMs, makeId } from "../../common/util";
-import { z } from "zod";
 
 const sanitizeHTML = jest.fn((str) => str);
 const Product = makeProductEntity({
@@ -27,6 +27,7 @@ const validMakeProductArgument: Readonly<MakeProduct_Argument> = deepFreeze({
   brand: "AMD",
   priceUnit: "USD",
   addedBy: makeId(),
+  categoryId: makeId(),
   name: "AMD Ryzen 5 5600 Processor",
   description: "Very powerful processor.",
   images: [{ id: "claes1sy001v1s4pj4it0crvn.jpg", isMain: true }],
@@ -47,6 +48,7 @@ const validEditProductChangesArgument: Readonly<EditProduct_Changes> =
         ? PRICE_UNITS.TAKA
         : PRICE_UNITS.USD,
     addedBy: makeId(),
+    categoryId: makeId(),
     name: validMakeProductArgument.name + "x",
     description: validMakeProductArgument.description + "x",
     images: [{ id: `${makeId()}.jpg`, isMain: true }],
@@ -58,7 +60,8 @@ const validEditProductChangesArgument: Readonly<EditProduct_Changes> =
       "I'm tired and suffering from cold-fever",
       "with severe headache",
     ],
-    isHidden: true,
+    isHidden: false,
+    isDeleted: false,
   });
 
 const invalidDataForMakeArgument: Record<keyof MakeProduct_Argument, any[]> =
@@ -69,7 +72,8 @@ const invalidDataForMakeArgument: Record<keyof MakeProduct_Argument, any[]> =
     shortDescriptions: [[], [""], ["   "], {}],
     name: ["", "  ", 324, ["string"], {}, null],
     brand: ["", "  ", 324, ["string"], {}, null],
-    addedBy: ["", "  ", 324, ["string"], {}, null],
+    addedBy: ["", 324, ["string"], {}, null],
+    categoryId: ["", 324, ["string"], {}, null],
     description: ["", "  ", 324, ["string"], {}, null],
     specifications: [null, { a: 1 }, { b: { c: 2 } }, { a: { b: "   " } }],
     images: [
@@ -88,6 +92,8 @@ const invalidDataForMakeArgument: Record<keyof MakeProduct_Argument, any[]> =
         { id: "a", isMain: true },
       ],
     ],
+    isHidden: [0, 1, "true"],
+    isDeleted: [0, 1, "false"],
   });
 
 const testData = deepFreeze([
@@ -113,7 +119,7 @@ const testData = deepFreeze([
     };
   }),
   ...Object.entries(invalidDataForMakeArgument)
-    // .filter(([k, v]) => k === "images")
+    .filter(([property]) => property in validMakeProductArgument)
     .map(([property, invalidDataArray]) => {
       return invalidDataArray.map((data) => {
         return {
@@ -134,6 +140,7 @@ describe("Product.make", () => {
       expect(product).toEqual({
         ...validMakeProductArgument,
         isHidden: false,
+        isDeleted: false,
         _id: expect.any(String),
         addedBy: expect.any(String),
         createdAt: expect.any(Number),
@@ -218,6 +225,7 @@ describe("Product.edit", () => {
 
 {
   const testData = Object.entries(invalidDataForMakeArgument)
+    // .filter(([key]) => ["isDeleted", "isHidden"].includes(key))
     .map(([key, values]) =>
       values.map((value) => ({
         changes: { [key]: value },

@@ -21,13 +21,14 @@ export type MakeProduct_Argument = Pick<
   | "addedBy"
   | "inStock"
   | "priceUnit"
+  | "categoryId"
   | "description"
   | "specifications"
   | "shortDescriptions"
 >;
 
 export type EditProduct_Changes = Partial<
-  MakeProduct_Argument & Pick<ProductPrivateInterface, "isHidden">
+  MakeProduct_Argument & Pick<ProductPrivateInterface, "isHidden" | "isDeleted">
 >;
 
 export interface EditProduct_Argument {
@@ -73,10 +74,11 @@ export function makeProductEntity(
 
   const MakeProductArgumentSchema = z
     .object({
+      addedBy: z.string().min(1),
       price: z.number().positive(),
+      categoryId: z.string().min(1),
       name: z.string().trim().min(1),
       brand: z.string().trim().min(1),
-      addedBy: z.string().trim().min(1),
       inStock: z.number().positive().int(),
       priceUnit: z.nativeEnum(PRICE_UNITS),
       specifications: z.record(SpecificationSchema),
@@ -107,6 +109,7 @@ export function makeProductEntity(
   const EditProduct_ChangesSchema = z
     .object({
       isHidden: z.boolean(),
+      isDeleted: z.boolean(),
     })
     .strict()
     .merge(MakeProductArgumentSchema.partial())
@@ -122,6 +125,7 @@ export function makeProductEntity(
   const ProductSchema = MakeProductArgumentSchema.extend({
     _id: z.string().min(1),
     isHidden: z.boolean(),
+    isDeleted: z.boolean(),
 
     // we're overwriting the "description" field because we
     // don't want to sanitize it while validating
@@ -143,16 +147,13 @@ export function makeProductEntity(
   // ==================[End ofValidation Schemas]===================
 
   function make(arg: MakeProduct_Argument): Readonly<ProductPrivateInterface> {
-    const productData = (() => {
-      const result = MakeProductArgumentSchema.safeParse(arg, { errorMap });
-      if (!result.success) throw result.error;
-      return result.data;
-    })();
+    const productData = MakeProductArgumentSchema.parse(arg, { errorMap });
 
     const product: Readonly<ProductPrivateInterface> = deepFreeze({
       ...productData,
       _id: makeId(),
       isHidden: false,
+      isDeleted: false,
       createdAt: currentTimeMs(),
     });
 
@@ -160,18 +161,9 @@ export function makeProductEntity(
   }
 
   function edit(arg: EditProduct_Argument): Readonly<ProductPrivateInterface> {
-    const { product, changes: unValidatedChanges } = arg;
+    const changes = EditProduct_ChangesSchema.parse(arg.changes, { errorMap });
 
-    const changes = (() => {
-      const result = EditProduct_ChangesSchema.safeParse(unValidatedChanges, {
-        errorMap,
-      });
-      if (!result.success) throw result.error;
-      return result.data;
-    })();
-
-    const editedProduct = { ...product, ...changes };
-
+    const editedProduct = { ...arg.product, ...changes };
     return deepFreeze(editedProduct);
   }
 
@@ -193,8 +185,7 @@ export function makeProductEntity(
   function validate(
     product: unknown
   ): asserts product is ProductPrivateInterface {
-    const result = ProductSchema.safeParse(product, { errorMap });
-    if (!result.success) throw result.error;
+    ProductSchema.parse(product, { errorMap });
   }
 
   return Object.freeze({ make, edit, validate });

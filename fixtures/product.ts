@@ -1,4 +1,4 @@
-import { omit } from "lodash";
+import { pick } from "lodash";
 import deepFreeze from "deep-freeze-strict";
 import type { ProductPrivateInterface } from "../src/entities/product/interface";
 import type { MakeProduct_Argument } from "../src/entities/product/make-product-entity";
@@ -9,8 +9,10 @@ export const sampleProduct: Readonly<ProductPrivateInterface> = deepFreeze({
   priceUnit: "USD",
   brand: "Kingston",
   isHidden: false,
+  isDeleted: false,
   createdAt: 1668935809106,
   _id: "clafgf2ns00lli0pj46od5r9t",
+  categoryId: "clafasdklfj23423136od5r9t",
   addedBy: "clafgf2ns00lli0pj46oakj23",
   name: "Kingston KC3000 1024GB PCIe 4.0 NVMe M.2 SSD",
   description: "<h2>Kingston KC3000 1024GB&nbsp;PCIe 4.0 NVMe M.2 SSD</h2>",
@@ -48,7 +50,20 @@ export const sampleProduct: Readonly<ProductPrivateInterface> = deepFreeze({
   },
 });
 
-export const sampleMakeProductArgument: MakeProduct_Argument = omit(
+export const sampleMakeProductArgument: MakeProduct_Argument = pick(
   sampleProduct,
-  ["_id", "isHidden", "createdAt"]
+  [
+    "name",
+    "brand",
+    "price",
+    "images",
+    "addedBy",
+    "inStock",
+    "priceUnit",
+    "categoryId",
+    "categoryId",
+    "description",
+    "specifications",
+    "shortDescriptions",
+  ]
 );

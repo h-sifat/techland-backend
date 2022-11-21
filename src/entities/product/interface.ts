@@ -16,11 +16,16 @@ interface CommonProductFields {
   specifications: Record<string, Record<string, string>>;
 }
 
-export type ProductPublicInterface = CommonProductFields & { inStock: boolean };
+export type ProductPublicInterface = CommonProductFields & {
+  inStock: boolean;
+  category: { id: string; name: string; parents: string[] };
+};
 export type ProductPrivateInterface = CommonProductFields & {
-  inStock: number;
   addedBy: string;
+  inStock: number;
   isHidden: boolean;
+  categoryId: string;
+  isDeleted: boolean;
 };
 
 enum PRICE_UNITS {
