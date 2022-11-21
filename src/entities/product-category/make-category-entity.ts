@@ -30,7 +30,7 @@ export interface CategoryEntity {
   validate(category: unknown): asserts category is CategoryInterface;
 }
 
-export function makeCategoryEntity(
+export function makeProductCategoryEntity(
   factoryArg: MakeCategoryEntity_Argument
 ): CategoryEntity {
   const { makeId, currentTimeMs, createHash } = factoryArg;

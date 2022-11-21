@@ -2,9 +2,9 @@ import deepFreezeStrict from "deep-freeze-strict";
 import { z } from "zod";
 import { createMD5Hash, currentTimeMs, makeId } from "../../common/util";
 import { CategoryInterface } from "./interface";
-import { makeCategoryEntity } from "./make-category-entity";
+import { makeProductCategoryEntity } from "./make-category-entity";
 
-const Category = makeCategoryEntity({
+const Category = makeProductCategoryEntity({
   makeId,
   currentTimeMs,
   createHash: createMD5Hash,
