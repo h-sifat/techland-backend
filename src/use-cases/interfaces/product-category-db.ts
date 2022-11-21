@@ -8,6 +8,7 @@ export interface DBQueryMethodArgs {
 }
 
 export interface ProductCategoryDatabase {
+  findAll(): Promise<Readonly<CategoryInterface>[]>;
   findById(
     arg: DBQueryMethodArgs["findById"]
   ): Promise<Readonly<CategoryInterface> | null>;
