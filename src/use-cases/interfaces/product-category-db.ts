@@ -3,7 +3,7 @@ import { CategoryInterface } from "../../entities/product-category/interface";
 export interface DBQueryMethodArgs {
   findById: { id: string };
   deleteById: { id: string };
-  findByHash: { name: string };
+  findByHash: { hash: string };
   updateById: { id: string; category: CategoryInterface };
 }
 
