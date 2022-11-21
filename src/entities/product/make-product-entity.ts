@@ -27,7 +27,7 @@ export type MakeProduct_Argument = Pick<
 >;
 
 export type EditProduct_Changes = Partial<
-  MakeProduct_Argument & Pick<ProductPrivateInterface, "isDeleted" | "isHidden">
+  MakeProduct_Argument & Pick<ProductPrivateInterface, "isHidden">
 >;
 
 export interface EditProduct_Argument {
@@ -77,7 +77,6 @@ export function makeProductEntity(
       name: z.string().trim().min(1),
       brand: z.string().trim().min(1),
       addedBy: z.string().trim().min(1),
-      images: z.array(ProductImageSchema),
       inStock: z.number().positive().int(),
       priceUnit: z.nativeEnum(PRICE_UNITS),
       specifications: z.record(SpecificationSchema),
@@ -88,6 +87,12 @@ export function makeProductEntity(
         .trim()
         .min(1)
         .transform((html) => sanitizeHTML(html).trim()),
+
+      images: z.array(ProductImageSchema).superRefine((images, ctx) => {
+        const errorMessage = validateImages(images);
+        if (errorMessage)
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: errorMessage });
+      }),
     })
     .strict();
 
@@ -102,7 +107,6 @@ export function makeProductEntity(
   const EditProduct_ChangesSchema = z
     .object({
       isHidden: z.boolean(),
-      isDeleted: z.boolean(),
     })
     .strict()
     .merge(MakeProductArgumentSchema.partial())
@@ -118,7 +122,6 @@ export function makeProductEntity(
   const ProductSchema = MakeProductArgumentSchema.extend({
     _id: z.string().min(1),
     isHidden: z.boolean(),
-    isDeleted: z.boolean(),
 
     // we're overwriting the "description" field because we
     // don't want to sanitize it while validating
@@ -142,17 +145,14 @@ export function makeProductEntity(
   function make(arg: MakeProduct_Argument): Readonly<ProductPrivateInterface> {
     const productData = (() => {
       const result = MakeProductArgumentSchema.safeParse(arg, { errorMap });
-      if (!result.success) throw result.error.flatten();
+      if (!result.success) throw result.error;
       return result.data;
     })();
-
-    assertValidImages(productData.images);
 
     const product: Readonly<ProductPrivateInterface> = deepFreeze({
       ...productData,
       _id: makeId(),
       isHidden: false,
-      isDeleted: false,
       createdAt: currentTimeMs(),
     });
 
@@ -166,40 +166,26 @@ export function makeProductEntity(
       const result = EditProduct_ChangesSchema.safeParse(unValidatedChanges, {
         errorMap,
       });
-      if (!result.success) throw result.error.flatten();
+      if (!result.success) throw result.error;
       return result.data;
     })();
 
     const editedProduct = { ...product, ...changes };
-    assertValidImages(editedProduct.images);
 
     return deepFreeze(editedProduct);
   }
 
-  function assertValidImages(images: ProductImage[]) {
+  function validateImages(images: ProductImage[]): string | void {
     const mainImage = images.filter((image) => image.isMain);
-    if (!mainImage.length)
-      throw {
-        formErrors: [],
-        fieldErrors: { images: ["No main image found."] },
-      };
+    if (!mainImage.length) return "No main image found.";
 
     if (mainImage.length > 1)
-      throw {
-        formErrors: [],
-        fieldErrors: {
-          images: ["Only one image can be selected as the main image."],
-        },
-      };
+      return "Only one image can be selected as the main image.";
 
     {
       const uniqueImageIds = new Set();
       for (const { id } of images)
-        if (uniqueImageIds.has(id))
-          throw {
-            formErrors: [],
-            fieldErrors: { images: ["Image id must be unique."] },
-          };
+        if (uniqueImageIds.has(id)) return "Image id must be unique.";
         else uniqueImageIds.add(id);
     }
   }
@@ -208,9 +194,7 @@ export function makeProductEntity(
     product: unknown
   ): asserts product is ProductPrivateInterface {
     const result = ProductSchema.safeParse(product, { errorMap });
-    if (!result.success) throw result.error.flatten();
-
-    assertValidImages(result.data.images);
+    if (!result.success) throw result.error;
   }
 
   return Object.freeze({ make, edit, validate });

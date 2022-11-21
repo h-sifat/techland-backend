@@ -7,6 +7,7 @@ import { inspect } from "util";
 import { PRICE_UNITS } from "./interface";
 import deepFreeze from "deep-freeze-strict";
 import { currentTimeMs, makeId } from "../../common/util";
+import { z } from "zod";
 
 const sanitizeHTML = jest.fn((str) => str);
 const Product = makeProductEntity({
@@ -58,7 +59,6 @@ const validEditProductChangesArgument: Readonly<EditProduct_Changes> =
       "with severe headache",
     ],
     isHidden: true,
-    isDeleted: true,
   });
 
 const invalidDataForMakeArgument: Record<keyof MakeProduct_Argument, any[]> =
@@ -134,7 +134,6 @@ describe("Product.make", () => {
       expect(product).toEqual({
         ...validMakeProductArgument,
         isHidden: false,
-        isDeleted: false,
         _id: expect.any(String),
         addedBy: expect.any(String),
         createdAt: expect.any(Number),
@@ -159,20 +158,24 @@ describe("Product.make", () => {
       `throws if: $case`,
       // @ts-ignore
       ({ productArg, errorType, invalidField }) => {
-        expect.assertions(1);
+        expect.assertions(2);
         try {
           // @ts-ignore
           Product.make(productArg);
         } catch (ex) {
+          expect(ex).toBeInstanceOf(z.ZodError);
+
           if (errorType === "formErrors")
-            expect(ex).toMatchObject({
+            expect(ex.flatten()).toMatchObject({
               fieldErrors: {},
               formErrors: [expect.any(String)],
             });
           else
-            expect(ex).toMatchObject({
+            expect(ex.flatten()).toMatchObject({
               formErrors: [],
-              fieldErrors: { [invalidField]: [expect.any(String)] },
+              fieldErrors: {
+                [invalidField]: expect.arrayContaining([expect.any(String)]),
+              },
             });
         }
       }
@@ -240,13 +243,14 @@ describe("Product.edit", () => {
     { name: "Product.validate", testFunc: validateTestFunction },
   ])("$name", ({ testFunc }) => {
     it.each(testData)(`throws if $case`, ({ changes, key }) => {
-      expect.assertions(1);
+      expect.assertions(2);
       try {
         testFunc({ product, changes });
       } catch (ex) {
-        expect(ex).toEqual({
+        expect(ex).toBeInstanceOf(z.ZodError);
+        expect(ex.flatten()).toMatchObject({
           formErrors: [],
-          fieldErrors: { [key]: [expect.any(String)] },
+          fieldErrors: { [key]: expect.arrayContaining([expect.any(String)]) },
         });
       }
     });

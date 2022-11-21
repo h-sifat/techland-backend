@@ -21,7 +21,6 @@ export type ProductPrivateInterface = CommonProductFields & {
   inStock: number;
   addedBy: string;
   isHidden: boolean;
-  isDeleted: boolean;
 };
 
 enum PRICE_UNITS {
