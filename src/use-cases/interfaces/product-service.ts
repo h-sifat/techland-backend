@@ -1,11 +1,12 @@
-import type { DBQueryMethodArgs } from "./product-db";
-import type { ProductPrivateInterface } from "../../entities/product/interface";
 import type {
   EditProduct_Changes,
   MakeProduct_Argument,
 } from "../../entities/product/make-product-entity";
+import type { DBQueryMethodArgs } from "./product-db";
+import type { ProductPrivateInterface } from "../../entities/product/interface";
 
 export interface ServiceArguments {
+  removeProduct: { id: string };
   addProduct: { product: MakeProduct_Argument };
   editProduct: { id: string; changes: EditProduct_Changes };
 }
@@ -18,4 +19,5 @@ export interface ProductService {
   ): Promise<Readonly<ProductPrivateInterface> | null>;
   addProduct(arg: ServiceArguments["addProduct"]): ProductResponse;
   editProduct(arg: ServiceArguments["editProduct"]): ProductResponse;
+  removeProduct(arg: ServiceArguments["removeProduct"]): ProductResponse;
 }
