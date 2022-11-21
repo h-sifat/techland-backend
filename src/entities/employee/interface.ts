@@ -3,7 +3,7 @@ export type IsAdminAndPermissions =
   | { isAdmin: false; permissions: Partial<EmployeePermissions> };
 
 export type EmployeePublicInterface = {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   createdAt: number;

@@ -7,7 +7,7 @@ export interface AddressConfigInterface {
 }
 
 export interface AddressPublicInterface {
-  id: string;
+  _id: string;
   city: string;
   phone: string;
   street: string;

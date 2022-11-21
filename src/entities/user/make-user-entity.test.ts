@@ -5,6 +5,7 @@ import {
 } from "./interface";
 import { makeUserEntity } from "./make-user-entity";
 import { createMD5Hash, currentTimeMs, makeId } from "../../common/util";
+import { z } from "zod";
 
 const config: Readonly<UserConfigInterface> = Object.freeze({
   MAX_NAME_LENGTH: 5,
@@ -32,7 +33,7 @@ describe("User.make", () => {
     expect(user).toEqual({
       ...validMakeUserArg,
       addresses: [],
-      id: expect.any(String),
+      _id: expect.any(String),
       password: expect.any(String),
       createdAt: expect.any(Number),
       accountStatus: ACCOUNT_STATUSES.OPEN,
@@ -87,13 +88,14 @@ describe("User.make", () => {
       },
     },
   ])(`throws error if $case`, async ({ arg, error }) => {
-    expect.assertions(1);
+    expect.assertions(2);
 
     try {
       // @ts-ignore
       await User.make(arg);
     } catch (ex) {
-      expect(ex).toEqual(error);
+      expect(ex).toBeInstanceOf(z.ZodError);
+      expect(ex.flatten()).toEqual(error);
     }
   });
 });
@@ -139,7 +141,7 @@ describe("User.edit", () => {
       error: { formErrors: [expect.any(String)], fieldErrors: {} },
     },
     {
-      changes: { id: "trying_to_change_the_id" },
+      changes: { _id: "trying_to_change_the_id" },
       case: `changes contains unknown properties`,
       error: { formErrors: [expect.any(String)], fieldErrors: {} },
     },
@@ -149,13 +151,14 @@ describe("User.edit", () => {
       error: { formErrors: [], fieldErrors: { name: [expect.any(String)] } },
     },
   ])(`throws error if $case`, async ({ changes, error }) => {
-    expect.assertions(1);
+    expect.assertions(2);
 
     try {
       // @ts-ignore
       await User.edit({ user, changes });
     } catch (ex) {
-      expect(ex).toEqual(error);
+      expect(ex).toBeInstanceOf(z.ZodError);
+      expect(ex.flatten()).toEqual(error);
     }
   });
 });
@@ -177,7 +180,7 @@ describe("User.validate", () => {
   it(`throws error if user is invalid`, async () => {
     expect(() => {
       // @ts-ignore
-      User.validate({ ...user, id: undefined });
+      User.validate({ ...user, _id: undefined });
     }).toThrow();
   });
 });

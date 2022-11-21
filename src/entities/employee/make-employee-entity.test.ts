@@ -1,6 +1,7 @@
 import { EmployeeConfig } from "./interface";
 import { makeEmployeeEntity } from "./make-employee-entity";
 import { createMD5Hash, currentTimeMs, makeId } from "../../common/util";
+import { z } from "zod";
 
 const config: EmployeeConfig = Object.freeze({
   MAX_NAME_LENGTH: 5,
@@ -47,7 +48,7 @@ describe("Employee.make", () => {
 
     expect(employee).toEqual({
       ...nameEmailAndPass,
-      id: expect.any(String),
+      _id: expect.any(String),
       password: expect.any(String),
       createdAt: expect.any(Number),
       isAdmin: false,
@@ -64,7 +65,7 @@ describe("Employee.make", () => {
 
     expect(employee).toEqual({
       ...nameEmailAndPass,
-      id: expect.any(String),
+      _id: expect.any(String),
       password: expect.any(String),
       createdAt: expect.any(Number),
       isAdmin: true,
@@ -120,7 +121,7 @@ describe("Employee.validate", () => {
   });
 
   it(`throws error if employee is invalid`, async () => {
-    expect.assertions(1);
+    expect.assertions(2);
 
     const employee = await Employee.make({
       ...nameEmailAndPass,
@@ -129,11 +130,12 @@ describe("Employee.validate", () => {
 
     try {
       // @ts-ignore Come on!
-      Employee.validate({ ...employee, id: undefined });
+      Employee.validate({ ...employee, _id: undefined });
     } catch (ex) {
-      expect(ex).toEqual({
+      expect(ex).toBeInstanceOf(z.ZodError);
+      expect(ex.flatten()).toEqual({
         formErrors: [],
-        fieldErrors: { id: [expect.any(String)] },
+        fieldErrors: { _id: [expect.any(String)] },
       });
     }
   });
@@ -204,11 +206,12 @@ describe("Employee.validate", () => {
     it.each(invalidPermissionForIsAdminValue)(
       `cannot set the "$pName" permission if "isAdmin" is $isAdmin`,
       async ({ isAdmin, permissions }) => {
-        expect.assertions(1);
+        expect.assertions(2);
         try {
           await testFunc({ isAdmin, permissions, employee });
         } catch (ex) {
-          expect(ex).toEqual({
+          expect(ex).toBeInstanceOf(z.ZodError);
+          expect(ex.flatten()).toEqual({
             formErrors: [],
             fieldErrors: { permissions: [expect.any(String)] },
           });

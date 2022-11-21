@@ -5,7 +5,7 @@ export interface UserConfigInterface {
 }
 
 export interface UserPublicInterface {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   createdAt: number;

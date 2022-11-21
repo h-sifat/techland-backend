@@ -14,12 +14,12 @@ import type { MakeId } from "../../common/interface";
 
 export type MakeAddress_Argument = Omit<
   AddressPublicInterface,
-  "id" | "createdAt"
+  "_id" | "createdAt"
 > &
   Pick<AddressPrivateInterface, "userId">;
 export interface EditAddress_Argument {
   address: AddressPrivateInterface;
-  changes: Partial<Omit<AddressPublicInterface, "id">>;
+  changes: Partial<Omit<AddressPublicInterface, "_id">>;
 }
 export interface AddressEntity {
   edit(arg: EditAddress_Argument): Readonly<AddressPrivateInterface>;
@@ -65,7 +65,7 @@ export function makeAddressEntity(
   const AddressSchema = z
     .object({
       isDeleted: z.boolean(),
-      id: z.string().trim().min(1),
+      _id: z.string().trim().min(1),
       hash: z.string().trim().min(1),
       createdAt: z.number().positive().int(),
     })
@@ -90,15 +90,15 @@ export function makeAddressEntity(
     address: unknown
   ): asserts address is AddressPrivateInterface {
     const result = AddressSchema.safeParse(address, { errorMap });
-    if (!result.success) throw result.error.flatten();
+    if (!result.success) throw result.error;
   }
 
   function make(arg: MakeAddress_Argument): Readonly<AddressPrivateInterface> {
     const result = MakeArgumentSchema.safeParse(arg, { errorMap });
-    if (!result.success) throw result.error.flatten();
+    if (!result.success) throw result.error;
 
     const address: Readonly<AddressPrivateInterface> = Object.freeze({
-      id: makeId(),
+      _id: makeId(),
       ...result.data,
       isDeleted: false,
       createdAt: currentTimeMs(),
@@ -112,7 +112,7 @@ export function makeAddressEntity(
     const { address, changes: unValidatedChanges } = arg;
 
     const result = ChangesSchema.safeParse(unValidatedChanges, { errorMap });
-    if (!result.success) throw result.error.flatten();
+    if (!result.success) throw result.error;
 
     const changes = result.data;
     const editedAddress = { ...address, ...changes };
@@ -122,7 +122,7 @@ export function makeAddressEntity(
   }
 
   function generateHash(
-    address: Omit<AddressPrivateInterface, "id" | "hash" | "createdAt">
+    address: Omit<AddressPrivateInterface, "_id" | "hash" | "createdAt">
   ): string {
     const { userId, city, zipCode, street, phone, district, isDeleted } =
       address;

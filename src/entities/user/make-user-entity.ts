@@ -84,7 +84,7 @@ export function makeUserEntity(
 
   const UserSchema = z
     .object({
-      id: z.string().min(1),
+      _id: z.string().min(1),
       password: z.string().min(1),
       email: z.string().trim().email(),
       addresses: z.array(z.string().min(1)),
@@ -109,11 +109,11 @@ export function makeUserEntity(
     arg: MakeUser_Argument
   ): Promise<Readonly<UserPrivateInterface>> {
     const result = MakeArgumentSchema.safeParse(arg, { errorMap });
-    if (!result.success) throw result.error.flatten();
+    if (!result.success) throw result.error;
 
     const user: Readonly<UserPrivateInterface> = Object.freeze({
       ...arg,
-      id: makeId(),
+      _id: makeId(),
       addresses: [],
       createdAt: currentTimeMs(),
       accountStatus: ACCOUNT_STATUSES.OPEN,
@@ -131,7 +131,7 @@ export function makeUserEntity(
     const result = ChangesSchema.safeParse(unValidatedChanges, {
       errorMap,
     });
-    if (!result.success) throw result.error.flatten();
+    if (!result.success) throw result.error;
 
     const changes = result.data;
     const { user } = arg;
@@ -150,7 +150,7 @@ export function makeUserEntity(
 
   function validate(user: unknown): asserts user is UserPrivateInterface {
     const result = UserSchema.safeParse(user, { errorMap });
-    if (!result.success) throw result.error.flatten();
+    if (!result.success) throw result.error;
   }
 
   return Object.freeze({ make, edit, validate });

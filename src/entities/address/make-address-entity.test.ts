@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { createMD5Hash, makeId } from "../../common/util/index";
 import { AddressConfigInterface } from "./interface";
 import { makeAddressEntity, MakeAddress_Argument } from "./make-address-entity";
@@ -18,7 +19,7 @@ const Address = makeAddressEntity({
 });
 
 const validMakeAddressArg: MakeAddress_Argument = Object.freeze({
-  userId: "id",
+  userId: "_id",
   phone: "a".repeat(config.phoneLength),
   city: "a".repeat(config.maxCityLength),
   zipCode: "a".repeat(config.zipCodeLength),
@@ -33,7 +34,7 @@ describe("Address.make", () => {
     expect(address).toEqual({
       isDeleted: false,
       ...validMakeAddressArg,
-      id: expect.any(String),
+      _id: expect.any(String),
       hash: expect.any(String),
       createdAt: expect.any(Number),
     });
@@ -81,12 +82,13 @@ describe("Address.make", () => {
         },
       },
     ])(`Address.make throws error if the arg $case`, ({ arg, error }) => {
-      expect.assertions(1);
+      expect.assertions(2);
       try {
         // @ts-ignore
         Address.make(arg);
       } catch (ex) {
-        expect(ex).toEqual(error);
+        expect(ex).toBeInstanceOf(z.ZodError);
+        expect(ex.flatten()).toEqual(error);
       }
     });
   }
@@ -121,12 +123,13 @@ describe("Address.edit", () => {
       error: { formErrors: [], fieldErrors: { city: [expect.any(String)] } },
     },
   ])(`Address.edit throws error if changes $case`, ({ changes, error }) => {
-    expect.assertions(1);
+    expect.assertions(2);
     try {
       // @ts-ignore
       Address.edit({ address, changes });
     } catch (ex) {
-      expect(ex).toEqual(error);
+      expect(ex).toBeInstanceOf(z.ZodError);
+      expect(ex.flatten()).toEqual(error);
     }
   });
 });
@@ -141,12 +144,13 @@ describe("Address.validate", () => {
   });
 
   it(`throws error if address is invalid`, () => {
-    expect.assertions(1);
+    expect.assertions(2);
     try {
       // @ts-ignore Shut up TS
       Address.validate({ ...address, createdAt: "not a timestamp" });
     } catch (ex) {
-      expect(ex).toEqual({
+      expect(ex).toBeInstanceOf(z.ZodError);
+      expect(ex.flatten()).toEqual({
         formErrors: [],
         fieldErrors: { createdAt: [expect.any(String)] },
       });

@@ -160,7 +160,7 @@ export function makeEmployeeEntity(
   const EmployeeSchema = z
     .object({
       isAdmin: z.boolean(),
-      id: z.string().min(1),
+      _id: z.string().min(1),
       isDeleted: z.boolean(),
       password: z.string().min(1),
       createdAt: z.number().positive().int(),
@@ -186,7 +186,7 @@ export function makeEmployeeEntity(
   ): Promise<Readonly<EmployeePrivateInterface>> {
     const validatedArg = (() => {
       const result = MakeArgumentSchema.safeParse(arg, { errorMap });
-      if (!result.success) throw result.error.flatten();
+      if (!result.success) throw result.error;
       return result.data;
     })();
 
@@ -200,14 +200,14 @@ export function makeEmployeeEntity(
         { errorMap }
       );
 
-      if (!result.success) throw result.error.flatten();
+      if (!result.success) throw result.error;
       return result.data;
     })();
 
     const employee: Readonly<EmployeePrivateInterface> = Object.freeze({
       ...validatedArg,
       ...isAdminAndPermissions,
-      id: makeId(),
+      _id: makeId(),
       isDeleted: false,
       createdAt: currentTimeMs(),
       password: await hashPassword(validatedArg.password),
@@ -226,7 +226,7 @@ export function makeEmployeeEntity(
     const { changes: unValidatedChanges, employee } = arg;
     const changes = (() => {
       const result = ChangesSchema.safeParse(unValidatedChanges, { errorMap });
-      if (!result.success) throw result.error.flatten();
+      if (!result.success) throw result.error;
       return result.data;
     })();
 
@@ -240,7 +240,7 @@ export function makeEmployeeEntity(
         { errorMap }
       );
 
-      if (!result.success) throw result.error.flatten();
+      if (!result.success) throw result.error;
       return result.data;
     })();
 
@@ -259,7 +259,7 @@ export function makeEmployeeEntity(
 
   function validate(arg: unknown): asserts arg is EmployeePrivateInterface {
     const result = EmployeeSchema.safeParse(arg, { errorMap });
-    if (!result.success) throw result.error.flatten();
+    if (!result.success) throw result.error;
 
     const employee = result.data;
 
@@ -272,7 +272,7 @@ export function makeEmployeeEntity(
         isAdminAndPermissions,
         { errorMap }
       );
-      if (!result.success) throw result.error.flatten();
+      if (!result.success) throw result.error;
     }
   }
 
