@@ -8,7 +8,7 @@ import type { CategoryInterface } from "../../entities/product-category/interfac
 export interface ServiceArguments {
   addCategory: { category: MakeCategory_Argument };
   editCategory: {
-    category: CategoryInterface;
+    id: string;
     changes: EditCategory_Argument["changes"];
   };
   findCategoryById: DBQueryMethodArgs["findById"];
