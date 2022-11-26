@@ -1,8 +1,8 @@
-import deepFreezeStrict from "deep-freeze-strict";
 import { z } from "zod";
-import { createMD5Hash, currentTimeMs, makeId } from "../../common/util";
 import { CategoryInterface } from "./interface";
+import deepFreezeStrict from "deep-freeze-strict";
 import { makeProductCategoryEntity } from "./make-category-entity";
+import { createMD5Hash, currentTimeMs, makeId } from "../../common/util";
 
 const Category = makeProductCategoryEntity({
   makeId,
@@ -20,6 +20,7 @@ const invalidData: Record<keyof CategoryInterface, any[]> = deepFreezeStrict({
   hash: [""],
   _id: ["", 321],
   parentId: ["", 234],
+  imageId: ["", 324, {}],
   name: ["", 234, "   "],
   isDeleted: [0, 1, "false"],
   createdAt: [-2343, 234.42332],
@@ -39,9 +40,10 @@ const invalidMakeArgTestData = ["name", "description", "parentId"]
 describe("Category.make", () => {
   it(`creates a category`, () => {
     const arg = Object.freeze({
+      imageId: makeId(),
+      parentId: makeId(),
       name: " Componets  ",
       description: "    description   ",
-      parentId: makeId(),
     });
 
     const category = Category.make(arg);
@@ -54,6 +56,11 @@ describe("Category.make", () => {
       createdAt: expect.any(Number),
       description: arg.description.trim(),
     });
+  });
+
+  it(`assigns null to imageId if not provided`, () => {
+    const category = Category.make({ name: "a" });
+    expect(category).toMatchObject({ imageId: null });
   });
 
   it.each(invalidMakeArgTestData)(
@@ -75,12 +82,18 @@ describe("Category.make", () => {
 });
 
 describe("Category.edit", () => {
-  const oldArg = Object.freeze({ name: "a", parentId: "a", description: "a" });
+  const oldArg = Object.freeze({
+    name: "a",
+    parentId: "a",
+    description: "a",
+    imageId: makeId(),
+  });
   const category = Category.make(oldArg);
 
   it(`can edit a category`, () => {
     const newArg = Object.freeze({
       name: "b",
+      imageId: null,
       parentId: "b",
       isDeleted: true,
       description: "b",

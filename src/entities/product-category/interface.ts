@@ -4,6 +4,7 @@ export interface CategoryInterface {
   name: string;
   createdAt: number;
   isDeleted: boolean;
+  imageId: string | null;
   parentId: string | null;
   description: string | null;
 }

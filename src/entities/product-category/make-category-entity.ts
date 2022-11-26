@@ -9,12 +9,15 @@ import type { MakeId } from "../../common/interface";
 import type { CategoryInterface } from "./interface";
 
 export type MakeCategory_Argument = Pick<CategoryInterface, "name"> &
-  Partial<Pick<CategoryInterface, "parentId" | "description">>;
+  Partial<Pick<CategoryInterface, "parentId" | "description" | "imageId">>;
 
 export type EditCategory_Argument = {
   category: CategoryInterface;
   changes: Partial<
-    Pick<CategoryInterface, "name" | "parentId" | "description" | "isDeleted">
+    Pick<
+      CategoryInterface,
+      "name" | "parentId" | "description" | "isDeleted" | "imageId"
+    >
   >;
 };
 
@@ -44,6 +47,7 @@ export function makeProductCategoryEntity(
       name: z.string().trim().min(1),
       createdAt: z.number().positive().int(),
       parentId: z.string().min(1).nullable(),
+      imageId: z.string().trim().min(1).nullable(),
       description: z.string().trim().min(1).nullable(),
     })
     .strict()
@@ -67,6 +71,7 @@ export function makeProductCategoryEntity(
     .object({
       name: z.string().trim().min(1),
       parentId: z.string().min(1).nullable().default(null),
+      imageId: z.string().trim().min(1).nullable().default(null),
       description: z.string().trim().min(1).nullable().default(null),
     })
     .strict();
