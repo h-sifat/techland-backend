@@ -132,6 +132,7 @@ export function makeProductEntity(
     description: z.string().trim().min(1),
 
     createdAt: z.number().positive().int(),
+    lastModifiedAt: z.number().positive().int(),
   });
 
   {
@@ -149,12 +150,14 @@ export function makeProductEntity(
   function make(arg: MakeProduct_Argument): Readonly<ProductPrivateInterface> {
     const productData = MakeProductArgumentSchema.parse(arg, { errorMap });
 
+    const timestamp = currentTimeMs();
     const product: Readonly<ProductPrivateInterface> = deepFreeze({
       ...productData,
       _id: makeId(),
       isHidden: false,
       isDeleted: false,
-      createdAt: currentTimeMs(),
+      createdAt: timestamp,
+      lastModifiedAt: timestamp,
     });
 
     return product;
@@ -163,7 +166,11 @@ export function makeProductEntity(
   function edit(arg: EditProduct_Argument): Readonly<ProductPrivateInterface> {
     const changes = EditProduct_ChangesSchema.parse(arg.changes, { errorMap });
 
-    const editedProduct = { ...arg.product, ...changes };
+    const editedProduct = {
+      ...arg.product,
+      ...changes,
+      lastModifiedAt: currentTimeMs(),
+    };
     return deepFreeze(editedProduct);
   }
 

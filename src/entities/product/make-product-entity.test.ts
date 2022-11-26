@@ -144,6 +144,7 @@ describe("Product.make", () => {
         _id: expect.any(String),
         addedBy: expect.any(String),
         createdAt: expect.any(Number),
+        lastModifiedAt: expect.any(Number),
       });
     });
 
@@ -202,6 +203,7 @@ describe("Product.edit", () => {
     expect(editedProduct).toEqual({
       ...product,
       ...validEditProductChangesArgument,
+      lastModifiedAt: expect.any(Number),
     });
   });
 
@@ -218,7 +220,11 @@ describe("Product.edit", () => {
         changes,
       });
 
-      expect(editedProduct).toEqual({ ...product, ...changes });
+      expect(editedProduct).toEqual({
+        ...product,
+        ...changes,
+        lastModifiedAt: expect.any(Number),
+      });
     });
   }
 });

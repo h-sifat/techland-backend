@@ -12,6 +12,7 @@ interface CommonProductFields {
   priceUnit: string;
   description: string;
   images: ProductImage[];
+  lastModifiedAt: number;
   shortDescriptions: string[];
   specifications: Record<string, Record<string, string>>;
 }

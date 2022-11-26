@@ -63,6 +63,10 @@ describe("Functionality", () => {
     const changes = Object.freeze({ name: "Alexa" });
 
     const edited = await editProduct({ id, changes });
-    expect(edited).toEqual({ ...sampleProduct, ...changes });
+    expect(edited).toEqual({
+      ...sampleProduct,
+      ...changes,
+      lastModifiedAt: expect.any(Number),
+    });
   });
 });

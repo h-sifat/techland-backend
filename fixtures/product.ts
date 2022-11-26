@@ -11,6 +11,7 @@ export const sampleProduct: Readonly<ProductPrivateInterface> = deepFreeze({
   isHidden: false,
   isDeleted: false,
   createdAt: 1668935809106,
+  lastModifiedAt: 1668935809106,
   _id: "clafgf2ns00lli0pj46od5r9t",
   categoryId: "clafasdklfj23423136od5r9t",
   addedBy: "clafgf2ns00lli0pj46oakj23",
