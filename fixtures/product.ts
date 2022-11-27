@@ -8,7 +8,6 @@ export const sampleProduct: Readonly<ProductPrivateInterface> = deepFreeze({
   inStock: 320,
   priceUnit: "USD",
   isHidden: false,
-  isDeleted: false,
   createdAt: 1668935809106,
   lastModifiedAt: 1668935809106,
   _id: "clafgf2ns00lli0pj46od5r9t",

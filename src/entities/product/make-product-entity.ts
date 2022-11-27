@@ -29,7 +29,7 @@ export type MakeProduct_Argument = Pick<
 >;
 
 export type EditProduct_Changes = Partial<
-  MakeProduct_Argument & Pick<ProductPrivateInterface, "isHidden" | "isDeleted">
+  MakeProduct_Argument & Pick<ProductPrivateInterface, "isHidden">
 >;
 
 export interface EditProduct_Argument {
@@ -125,7 +125,6 @@ export function makeProductEntity(
   const EditProduct_ChangesSchema = z
     .object({
       isHidden: z.boolean(),
-      isDeleted: z.boolean(),
     })
     .merge(MakeProductArgumentSchema.partial())
     .strict()
@@ -141,7 +140,6 @@ export function makeProductEntity(
   const ProductSchema = MakeProductArgumentSchema.extend({
     _id: z.string().min(1),
     isHidden: z.boolean(),
-    isDeleted: z.boolean(),
 
     // we're overwriting the "description" field because we
     // don't want to sanitize it while validating
@@ -171,7 +169,6 @@ export function makeProductEntity(
       ...productData,
       _id: makeId(),
       isHidden: false,
-      isDeleted: false,
       createdAt: timestamp,
       lastModifiedAt: timestamp,
     });

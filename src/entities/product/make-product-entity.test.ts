@@ -64,7 +64,6 @@ const validEditProductChangesArgument: Readonly<EditProduct_Changes> =
       "with severe headache",
     ],
     isHidden: false,
-    isDeleted: false,
   });
 
 const invalidDataForMakeArgument: Record<keyof MakeProduct_Argument, any[]> =
@@ -104,7 +103,6 @@ const invalidDataForMakeArgument: Record<keyof MakeProduct_Argument, any[]> =
       { id: "24234", name: "Volvo", unknown: "oh, hi!" },
     ],
     isHidden: [0, 1, "true"],
-    isDeleted: [0, 1, "false"],
   });
 
 const testData = deepFreeze([
@@ -151,7 +149,6 @@ describe("Product.make", () => {
       expect(product).toEqual({
         ...validMakeProductArgument,
         isHidden: false,
-        isDeleted: false,
         _id: expect.any(String),
         addedBy: expect.any(String),
         createdAt: expect.any(Number),

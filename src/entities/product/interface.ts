@@ -8,12 +8,13 @@ export interface ProductBrand {
   name: string;
 }
 
-interface CommonProductFields {
+export interface CommonProductFields {
   _id: string;
   name: string;
   price: number;
   createdAt: number;
   priceUnit: string;
+  categoryId: string;
   brand: ProductBrand;
   description: string;
   images: ProductImage[];
@@ -24,14 +25,11 @@ interface CommonProductFields {
 
 export type ProductPublicInterface = CommonProductFields & {
   inStock: boolean;
-  category: { id: string; name: string; parents: string[] };
 };
 export type ProductPrivateInterface = CommonProductFields & {
   addedBy: string;
   inStock: number;
   isHidden: boolean;
-  categoryId: string;
-  isDeleted: boolean;
 };
 
 enum PRICE_UNITS {
