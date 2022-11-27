@@ -1,12 +1,13 @@
-import { z } from "zod";
 import {
   isNever,
   makeZodErrorMap,
   MissingOrUnknownPropertiesInSchema,
 } from "../../common/util/zod";
+import { z } from "zod";
 
 import {
   PRICE_UNITS,
+  ProductBrand,
   ProductImage,
   ProductPrivateInterface,
 } from "./interface";
@@ -70,15 +71,30 @@ export function makeProductEntity(
     isNever<shouldBeNever>();
   }
 
+  const ProductBrandSchema = z
+    .object({
+      id: z.string().trim().min(1),
+      name: z.string().trim().min(1),
+    })
+    .strict();
+
+  {
+    type shouldBeNever = MissingOrUnknownPropertiesInSchema<
+      z.infer<typeof ProductBrandSchema>,
+      ProductBrand
+    >;
+    isNever<shouldBeNever>();
+  }
+
   const SpecificationSchema = z.record(z.string().trim().min(1));
 
   const MakeProductArgumentSchema = z
     .object({
+      brand: ProductBrandSchema,
       addedBy: z.string().min(1),
       price: z.number().positive(),
       categoryId: z.string().min(1),
       name: z.string().trim().min(1),
-      brand: z.string().trim().min(1),
       inStock: z.number().positive().int(),
       priceUnit: z.nativeEnum(PRICE_UNITS),
       specifications: z.record(SpecificationSchema),
@@ -111,8 +127,8 @@ export function makeProductEntity(
       isHidden: z.boolean(),
       isDeleted: z.boolean(),
     })
-    .strict()
     .merge(MakeProductArgumentSchema.partial())
+    .strict()
     .partial();
   {
     type shouldBeNever = MissingOrUnknownPropertiesInSchema<

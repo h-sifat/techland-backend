@@ -24,11 +24,11 @@ beforeEach(() => {
 const validMakeProductArgument: Readonly<MakeProduct_Argument> = deepFreeze({
   price: 184,
   inStock: 64,
-  brand: "AMD",
   priceUnit: "USD",
   addedBy: makeId(),
   categoryId: makeId(),
   name: "AMD Ryzen 5 5600 Processor",
+  brand: { id: makeId(), name: "AMD" },
   description: "Very powerful processor.",
   images: [{ id: "claes1sy001v1s4pj4it0crvn.jpg", isMain: true }],
   specifications: {
@@ -42,7 +42,10 @@ const validEditProductChangesArgument: Readonly<EditProduct_Changes> =
   deepFreeze({
     price: validMakeProductArgument.price + 1,
     inStock: validMakeProductArgument.inStock + 1,
-    brand: validMakeProductArgument.brand + "X",
+    brand: {
+      ...validMakeProductArgument.brand,
+      name: validMakeProductArgument.name + "x",
+    },
     priceUnit:
       validMakeProductArgument.priceUnit === PRICE_UNITS.USD
         ? PRICE_UNITS.TAKA
@@ -71,7 +74,6 @@ const invalidDataForMakeArgument: Record<keyof MakeProduct_Argument, any[]> =
     inStock: [-234, 234.232],
     shortDescriptions: [[], [""], ["   "], {}],
     name: ["", "  ", 324, ["string"], {}, null],
-    brand: ["", "  ", 324, ["string"], {}, null],
     addedBy: ["", 324, ["string"], {}, null],
     categoryId: ["", 324, ["string"], {}, null],
     description: ["", "  ", 324, ["string"], {}, null],
@@ -91,6 +93,15 @@ const invalidDataForMakeArgument: Record<keyof MakeProduct_Argument, any[]> =
         { id: "a", isMain: true },
         { id: "a", isMain: true },
       ],
+    ],
+    brand: [
+      {},
+      null,
+      { id: "", name: "fla" },
+      { id: 24234, name: "fla" },
+      { id: "24234", name: "" },
+      { id: "24234", name: "   " },
+      { id: "24234", name: "Volvo", unknown: "oh, hi!" },
     ],
     isHidden: [0, 1, "true"],
     isDeleted: [0, 1, "false"],

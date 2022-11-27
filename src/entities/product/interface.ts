@@ -3,13 +3,18 @@ export interface ProductImage {
   isMain: boolean;
 }
 
+export interface ProductBrand {
+  id: string;
+  name: string;
+}
+
 interface CommonProductFields {
   _id: string;
   name: string;
-  brand: string;
   price: number;
   createdAt: number;
   priceUnit: string;
+  brand: ProductBrand;
   description: string;
   images: ProductImage[];
   lastModifiedAt: number;
