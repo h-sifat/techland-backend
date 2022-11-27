@@ -6,16 +6,18 @@ import {
 } from "../../common/util/zod";
 
 import type { MakeId } from "../../common/interface";
-import type { CategoryInterface } from "./interface";
+import type { CategoryPrivateInterface } from "./interface";
 
-export type MakeCategory_Argument = Pick<CategoryInterface, "name"> &
-  Partial<Pick<CategoryInterface, "parentId" | "description" | "imageId">>;
+export type MakeCategory_Argument = Pick<CategoryPrivateInterface, "name"> &
+  Partial<
+    Pick<CategoryPrivateInterface, "parentId" | "description" | "imageId">
+  >;
 
 export type EditCategory_Argument = {
-  category: CategoryInterface;
+  category: CategoryPrivateInterface;
   changes: Partial<
     Pick<
-      CategoryInterface,
+      CategoryPrivateInterface,
       "name" | "parentId" | "description" | "isDeleted" | "imageId"
     >
   >;
@@ -28,9 +30,9 @@ export interface MakeCategoryEntity_Argument {
 }
 
 export interface CategoryEntity {
-  make(arg: MakeCategory_Argument): Readonly<CategoryInterface>;
-  edit(arg: EditCategory_Argument): Readonly<CategoryInterface>;
-  validate(category: unknown): asserts category is CategoryInterface;
+  make(arg: MakeCategory_Argument): Readonly<CategoryPrivateInterface>;
+  edit(arg: EditCategory_Argument): Readonly<CategoryPrivateInterface>;
+  validate(category: unknown): asserts category is CategoryPrivateInterface;
 }
 
 export function makeProductCategoryEntity(
@@ -62,7 +64,7 @@ export function makeProductCategoryEntity(
   {
     type shouldBeNever = MissingOrUnknownPropertiesInSchema<
       z.infer<typeof CategorySchema>,
-      CategoryInterface
+      CategoryPrivateInterface
     >;
     isNever<shouldBeNever>();
   }
@@ -100,10 +102,12 @@ export function makeProductCategoryEntity(
   const errorMap = makeZodErrorMap({ objectName: "Category" });
   // =================[End Validation Schemas]====================
 
-  function make(arg: MakeCategory_Argument): Readonly<CategoryInterface> {
+  function make(
+    arg: MakeCategory_Argument
+  ): Readonly<CategoryPrivateInterface> {
     const categoryArg = MakeCategoryArgumentSchema.parse(arg, { errorMap });
 
-    const category: Readonly<CategoryInterface> = Object.freeze({
+    const category: Readonly<CategoryPrivateInterface> = Object.freeze({
       ...categoryArg,
       _id: makeId(),
       isDeleted: false,
@@ -114,21 +118,28 @@ export function makeProductCategoryEntity(
     return category;
   }
 
-  function edit(arg: EditCategory_Argument): Readonly<CategoryInterface> {
+  function edit(
+    arg: EditCategory_Argument
+  ): Readonly<CategoryPrivateInterface> {
     const changes = EditCategoryChangesSchema.parse(arg.changes, { errorMap });
 
-    const editedCategory: CategoryInterface = { ...arg.category, ...changes };
+    const editedCategory: CategoryPrivateInterface = {
+      ...arg.category,
+      ...changes,
+    };
     editedCategory.hash = calculateCategoryHash(editedCategory);
 
     return Object.freeze(editedCategory);
   }
 
-  function validate(category: unknown): asserts category is CategoryInterface {
+  function validate(
+    category: unknown
+  ): asserts category is CategoryPrivateInterface {
     CategorySchema.parse(category, { errorMap });
   }
 
   function calculateCategoryHash(
-    category: Pick<CategoryInterface, "name" | "parentId">
+    category: Pick<CategoryPrivateInterface, "name" | "parentId">
   ) {
     const string = category.name.toLowerCase() + String(category.parentId);
     return createHash(string);

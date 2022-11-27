@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CategoryInterface } from "./interface";
+import { CategoryPrivateInterface } from "./interface";
 import deepFreezeStrict from "deep-freeze-strict";
 import { makeProductCategoryEntity } from "./make-category-entity";
 import { createMD5Hash, currentTimeMs, makeId } from "../../common/util";
@@ -16,16 +16,17 @@ const validMakeCategoryArg = Object.freeze({
   description: "Core components like CUPs, MOBOs",
 });
 
-const invalidData: Record<keyof CategoryInterface, any[]> = deepFreezeStrict({
-  hash: [""],
-  _id: ["", 321],
-  parentId: ["", 234],
-  imageId: ["", 324, {}],
-  name: ["", 234, "   "],
-  isDeleted: [0, 1, "false"],
-  createdAt: [-2343, 234.42332],
-  description: ["", 234, "   "],
-});
+const invalidData: Record<keyof CategoryPrivateInterface, any[]> =
+  deepFreezeStrict({
+    hash: [""],
+    _id: ["", 321],
+    parentId: ["", 234],
+    imageId: ["", 324, {}],
+    name: ["", 234, "   "],
+    isDeleted: [0, 1, "false"],
+    createdAt: [-2343, 234.42332],
+    description: ["", 234, "   "],
+  });
 
 const invalidMakeArgTestData = ["name", "description", "parentId"]
   .map((property) => {

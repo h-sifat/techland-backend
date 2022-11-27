@@ -3,7 +3,7 @@ import type {
   MakeCategory_Argument,
 } from "../../entities/product-category/make-category-entity";
 import type { DBQueryMethodArgs } from "./product-category-db";
-import type { CategoryInterface } from "../../entities/product-category/interface";
+import type { CategoryPrivateInterface } from "../../entities/product-category/interface";
 
 export interface ServiceArguments {
   addCategory: { category: MakeCategory_Argument };
@@ -14,12 +14,12 @@ export interface ServiceArguments {
   findCategoryById: DBQueryMethodArgs["findById"];
 }
 
-type CategoryResponse = Promise<Readonly<CategoryInterface>>;
+type CategoryResponse = Promise<Readonly<CategoryPrivateInterface>>;
 export interface ProductCategoryService {
   findCategoryById(
     arg: ServiceArguments["findCategoryById"]
-  ): Promise<Readonly<CategoryInterface> | null>;
-  listCategories(): Promise<Readonly<CategoryInterface>[]>;
+  ): Promise<Readonly<CategoryPrivateInterface> | null>;
+  listCategories(): Promise<Readonly<CategoryPrivateInterface>[]>;
   addCategory(arg: ServiceArguments["addCategory"]): CategoryResponse;
   editCategory(arg: ServiceArguments["editCategory"]): CategoryResponse;
 }
