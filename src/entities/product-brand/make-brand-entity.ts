@@ -6,6 +6,7 @@ import {
 import { z } from "zod";
 
 import type { MakeId } from "../../common/interface";
+import type { ProductBrandInterface } from "./interface";
 //  ======== end of imports ========
 
 export type MakeBrand_Argument = Pick<ProductBrandInterface, "name">;

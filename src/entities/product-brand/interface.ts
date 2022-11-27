@@ -1,4 +1,4 @@
-interface ProductBrandInterface {
+export interface ProductBrandInterface {
   _id: string;
   name: string;
   createdAt: number;
