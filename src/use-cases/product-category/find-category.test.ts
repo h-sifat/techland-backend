@@ -15,9 +15,10 @@ it(`calls the database.findById with the given id and returns the response`, asy
   database.findById.mockResolvedValueOnce(response);
 
   const id = "2342312";
-  const result = await findCategoryById({ id });
+  const options = Object.freeze({ audience: "private" });
+  const result = await findCategoryById({ id }, options);
 
   expect(result).toBe(response);
   expect(database.findById).toHaveBeenCalledTimes(1);
-  expect(database.findById).toHaveBeenCalledWith({ id });
+  expect(database.findById).toHaveBeenCalledWith({ id }, options);
 });

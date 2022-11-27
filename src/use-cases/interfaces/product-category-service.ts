@@ -2,7 +2,10 @@ import type {
   EditCategory_Argument,
   MakeCategory_Argument,
 } from "../../entities/product-category/make-category-entity";
-import type { DBQueryMethodArgs } from "./product-category-db";
+import type {
+  DBQueryMethodArgs,
+  ProductCategoryDatabase,
+} from "./product-category-db";
 import type { CategoryPrivateInterface } from "../../entities/product-category/interface";
 
 export interface ServiceArguments {
@@ -16,10 +19,8 @@ export interface ServiceArguments {
 
 type CategoryResponse = Promise<Readonly<CategoryPrivateInterface>>;
 export interface ProductCategoryService {
-  findCategoryById(
-    arg: ServiceArguments["findCategoryById"]
-  ): Promise<Readonly<CategoryPrivateInterface> | null>;
-  listCategories(): Promise<Readonly<CategoryPrivateInterface>[]>;
+  listCategories: ProductCategoryDatabase["findAll"];
+  findCategoryById: ProductCategoryDatabase["findById"];
   addCategory(arg: ServiceArguments["addCategory"]): CategoryResponse;
   editCategory(arg: ServiceArguments["editCategory"]): CategoryResponse;
 }

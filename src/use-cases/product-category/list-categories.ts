@@ -1,5 +1,5 @@
-import { ProductCategoryDatabase } from "../interfaces/product-category-db";
-import { ProductCategoryService } from "../interfaces/product-category-service";
+import type { ProductCategoryDatabase } from "../interfaces/product-category-db";
+import type { ProductCategoryService } from "../interfaces/product-category-service";
 
 export interface MakeListProductCategories_Argument {
   database: Pick<ProductCategoryDatabase, "findAll">;
@@ -10,7 +10,7 @@ export function makeListProductCategories(
 ): ProductCategoryService["listCategories"] {
   const { database } = factoryArg;
 
-  return async function listProductCategories() {
-    return await database.findAll();
+  return async function listProductCategories(options) {
+    return await database.findAll(options);
   };
 }

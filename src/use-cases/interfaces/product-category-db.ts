@@ -1,4 +1,7 @@
-import { CategoryPrivateInterface } from "../../entities/product-category/interface";
+import type {
+  CategoryPublicInterface,
+  CategoryPrivateInterface,
+} from "../../entities/product-category/interface";
 
 export interface DBQueryMethodArgs {
   findById: { id: string };
@@ -7,11 +10,23 @@ export interface DBQueryMethodArgs {
   updateById: { id: string; category: CategoryPrivateInterface };
 }
 
+export interface ReadOptions {
+  audience: "public" | "private";
+}
+
+export type FindResult<audience extends ReadOptions["audience"]> =
+  audience extends "public"
+    ? CategoryPublicInterface
+    : CategoryPrivateInterface;
+
 export interface ProductCategoryDatabase {
-  findAll(): Promise<Readonly<CategoryPrivateInterface>[]>;
-  findById(
-    arg: DBQueryMethodArgs["findById"]
-  ): Promise<Readonly<CategoryPrivateInterface> | null>;
+  findAll<Options extends ReadOptions>(
+    options: Options
+  ): Promise<Readonly<FindResult<Options["audience"]>>[]>;
+  findById<Options extends ReadOptions>(
+    arg: DBQueryMethodArgs["findById"],
+    options: Options
+  ): Promise<Readonly<FindResult<Options["audience"]>> | null>;
   findByHash(
     arg: DBQueryMethodArgs["findByHash"]
   ): Promise<Readonly<CategoryPrivateInterface> | null>;

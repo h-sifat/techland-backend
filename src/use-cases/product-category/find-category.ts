@@ -10,8 +10,8 @@ export function makeFindCategoryById(
 ): ProductCategoryService["findCategoryById"] {
   const { database } = factoryArg;
 
-  return async function findCategoryById(arg) {
+  return async function findCategoryById(arg, options) {
     const { id } = arg;
-    return await database.findById({ id });
+    return await database.findById({ id }, options);
   };
 }
