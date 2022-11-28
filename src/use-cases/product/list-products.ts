@@ -10,8 +10,7 @@ export function makeListProducts(
 ): ProductService["listProducts"] {
   const { database } = factoryArg;
 
-  // @ts-expect-error
-  return async function listProducts(arg, options) {
-    return await database.find(arg, options);
+  return async function listProducts(arg) {
+    return (await database.find(arg)) as any;
   };
 }

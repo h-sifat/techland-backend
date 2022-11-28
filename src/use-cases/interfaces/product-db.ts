@@ -13,14 +13,11 @@ export interface DBQueryMethodArgs {
   find: {
     brandIds?: string[];
     categoryId?: string | null;
+    formatDocumentAs: "public" | "private";
     priceRange?: { min?: number; max?: number };
     sortBy?: { price?: "ascending" | "descending" };
     pagination: { pageNumber: number; itemsPerPage: number };
   };
-}
-
-export interface FindOptions {
-  audience: "public" | "private";
 }
 
 export type MinifiedProductCommonFields = Pick<
@@ -28,12 +25,8 @@ export type MinifiedProductCommonFields = Pick<
   "_id" | "name" | "price" | "priceUnit" | "shortDescriptions"
 > & { imageUrl: string };
 
-export type MinifiedPublicProductInterface = MinifiedProductCommonFields & {
-  inStock: boolean;
-};
-
+export type MinifiedPublicProductInterface = MinifiedProductCommonFields;
 export type MinifiedPrivateProductInterface = MinifiedProductCommonFields & {
-  inStock: number;
   isHidden: boolean;
 };
 
@@ -62,10 +55,9 @@ export interface ProductDatabase {
     arg: DBQueryMethodArgs["updateById"]
   ): Promise<Readonly<ProductPrivateInterface>>;
 
-  find<Options extends FindOptions>(
-    arg: DBQueryMethodArgs["find"],
-    options: Options
-  ): Options["audience"] extends "public"
+  find<Arg extends DBQueryMethodArgs["find"]>(
+    arg: Arg
+  ): Arg["formatDocumentAs"] extends "public"
     ? Promise<FindResult<MinifiedPublicProductInterface>>
     : Promise<FindResult<MinifiedPrivateProductInterface>>;
 }
