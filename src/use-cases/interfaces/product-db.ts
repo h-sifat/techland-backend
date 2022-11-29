@@ -3,6 +3,7 @@ import type {
   CommonProductFields,
   ProductPrivateInterface,
 } from "../../entities/product/interface";
+import type { PaginationObject } from "../../data-access/util";
 import type { CategoryPrivateInterface } from "../../entities/product-category/interface";
 
 export interface DBQueryMethodArgs {
@@ -13,10 +14,10 @@ export interface DBQueryMethodArgs {
   find: {
     brandIds?: string[];
     categoryId?: string | null;
+    pagination: PaginationObject;
     formatDocumentAs: "public" | "private";
     priceRange?: { min?: number; max?: number };
-    sortBy?: { price?: "ascending" | "descending" };
-    pagination: { pageNumber: number; itemsPerPage: number };
+    sortBy?: { price: "ascending" | "descending" };
   };
 }
 

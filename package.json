@@ -30,6 +30,7 @@
     "deep-freeze-strict": "^1.1.1",
     "isomorphic-dompurify": "^0.24.0",
     "lodash": "^4.17.21",
+    "mongodb": "^4.12.1",
     "zod": "^3.19.1"
   }
 }
