@@ -23,7 +23,7 @@ export function makeEditProductBrand(
       });
 
     const editedBrand = ProductBrand.edit({ brand, changes });
-    await database.updateById({ id, brand: editedBrand });
+    await database.updateById({ id, document: editedBrand });
 
     return editedBrand;
   };

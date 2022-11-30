@@ -4,7 +4,7 @@ export interface DBQueryMethodArgs {
   findById: { id: string };
   deleteById: { id: string };
   findByName: { name: string };
-  updateById: { id: string; brand: ProductBrandInterface };
+  updateById: { id: string; document: ProductBrandInterface };
 }
 
 export interface ProductBrandDatabase {
@@ -16,7 +16,5 @@ export interface ProductBrandDatabase {
   findByName(
     arg: DBQueryMethodArgs["findByName"]
   ): Promise<Readonly<ProductBrandInterface> | null>;
-  updateById(
-    arg: DBQueryMethodArgs["updateById"]
-  ): Promise<Readonly<ProductBrandInterface>>;
+  updateById(arg: DBQueryMethodArgs["updateById"]): Promise<void>;
 }
