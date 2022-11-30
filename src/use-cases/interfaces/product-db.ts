@@ -2,12 +2,16 @@ import type {
   ProductBrand,
   CommonProductFields,
   ProductPrivateInterface,
+  ProductPublicInterface,
 } from "../../entities/product/interface";
 import type { PaginationObject } from "../../data-access/util";
 import type { CategoryPrivateInterface } from "../../entities/product-category/interface";
 
 export interface DBQueryMethodArgs {
-  findById: { id: string };
+  findById: {
+    ids: string[];
+    formatDocumentAs: "public" | "private";
+  };
   deleteById: { id: string };
   findByName: { name: string };
   updateById: { id: string; product: ProductPrivateInterface };
@@ -48,7 +52,13 @@ type ProductResponse = Promise<Readonly<ProductPrivateInterface> | null>;
 
 export interface ProductDatabase {
   insert(arg: ProductPrivateInterface): Promise<void>;
-  findById(arg: DBQueryMethodArgs["findById"]): ProductResponse;
+
+  findByIds<Arg extends DBQueryMethodArgs["findById"]>(
+    arg: Arg
+  ): Arg["formatDocumentAs"] extends "public"
+    ? Promise<Readonly<ProductPublicInterface>[]>
+    : Promise<Readonly<ProductPrivateInterface>[]>;
+
   deleteById(arg: DBQueryMethodArgs["deleteById"]): Promise<void>;
   findByName(arg: DBQueryMethodArgs["findByName"]): ProductResponse;
 

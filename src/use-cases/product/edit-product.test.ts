@@ -2,7 +2,7 @@ import { makeEditProduct } from "./edit-product";
 import { sampleProduct } from "../../../fixtures/product";
 
 const database = Object.freeze({
-  findById: jest.fn(),
+  findByIds: jest.fn(),
   updateById: jest.fn(),
 });
 const dbMethods = Object.freeze(Object.values(database));
@@ -19,7 +19,7 @@ describe("Validation", () => {
     it(`throws ewc "${errorCode}" if no product exists with the given id`, async () => {
       expect.assertions(4);
 
-      database.findById.mockResolvedValueOnce(null);
+      database.findByIds.mockResolvedValueOnce([]);
       const id = "a";
 
       try {
@@ -28,8 +28,11 @@ describe("Validation", () => {
         expect(ex.code).toBe("PRODUCT_NOT_FOUND");
       }
 
-      expect(database.findById).toHaveBeenCalledTimes(1);
-      expect(database.findById).toHaveBeenCalledWith({ id });
+      expect(database.findByIds).toHaveBeenCalledTimes(1);
+      expect(database.findByIds).toHaveBeenCalledWith({
+        ids: [id],
+        formatDocumentAs: "private",
+      });
       expect(database.updateById).not.toHaveBeenCalled();
     });
   }
@@ -37,7 +40,7 @@ describe("Validation", () => {
   it(`throws error if the "changes" object is invalid`, async () => {
     expect.assertions(4);
 
-    database.findById.mockResolvedValueOnce(sampleProduct);
+    database.findByIds.mockResolvedValueOnce([sampleProduct]);
     const id = sampleProduct._id;
 
     try {
@@ -50,15 +53,18 @@ describe("Validation", () => {
       expect(1).toBe(1);
     }
 
-    expect(database.findById).toHaveBeenCalledTimes(1);
-    expect(database.findById).toHaveBeenCalledWith({ id });
+    expect(database.findByIds).toHaveBeenCalledTimes(1);
+    expect(database.findByIds).toHaveBeenCalledWith({
+      ids: [id],
+      formatDocumentAs: "private",
+    });
     expect(database.updateById).not.toHaveBeenCalled();
   });
 });
 
 describe("Functionality", () => {
   it(`edits a product`, async () => {
-    database.findById.mockResolvedValueOnce(sampleProduct);
+    database.findByIds.mockResolvedValueOnce([sampleProduct]);
     const id = sampleProduct._id;
     const changes = Object.freeze({ name: "Alexa" });
 
