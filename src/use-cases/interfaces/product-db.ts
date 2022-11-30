@@ -13,7 +13,6 @@ export interface DBQueryMethodArgs {
     formatDocumentAs: "public" | "private";
   };
   deleteByIds: { ids: string[] };
-  findByName: { name: string };
   updateById: { id: string; product: ProductPrivateInterface };
   find: {
     brandIds?: string[];
@@ -48,8 +47,6 @@ export interface FindResult<
   categories: Pick<CategoryPrivateInterface, "_id" | "name" | "parentId">;
 }
 
-type ProductResponse = Promise<Readonly<ProductPrivateInterface> | null>;
-
 export interface ProductDatabase {
   insert(arg: ProductPrivateInterface): Promise<void>;
 
@@ -60,7 +57,6 @@ export interface ProductDatabase {
     : Promise<Readonly<ProductPrivateInterface>[]>;
 
   deleteByIds(arg: DBQueryMethodArgs["deleteByIds"]): Promise<void>;
-  findByName(arg: DBQueryMethodArgs["findByName"]): ProductResponse;
 
   updateById(
     arg: DBQueryMethodArgs["updateById"]
