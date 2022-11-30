@@ -19,6 +19,4 @@ export interface ProductBrandDatabase {
   updateById(
     arg: DBQueryMethodArgs["updateById"]
   ): Promise<Readonly<ProductBrandInterface>>;
-  insert(arg: ProductBrandInterface): Promise<void>;
-  deleteById(arg: DBQueryMethodArgs["deleteById"]): Promise<void>;
 }
