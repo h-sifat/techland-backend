@@ -1,13 +1,13 @@
 import { sampleProduct } from "../../../fixtures/product";
-import { makeDeleteProduct } from "./delete-product";
+import { makeDeleteProducts } from "./delete-products";
 
 const database = Object.freeze({
   findByIds: jest.fn(),
-  deleteById: jest.fn(),
+  deleteByIds: jest.fn(),
 });
 const dbMethods = Object.freeze(Object.values(database));
 
-const deleteProduct = makeDeleteProduct({ database });
+const deleteProduct = makeDeleteProducts({ database });
 
 beforeEach(() => {
   dbMethods.forEach((method) => method.mockReset());
@@ -23,9 +23,9 @@ describe("Validation", () => {
       const id = "a";
 
       try {
-        await deleteProduct({ id });
+        await deleteProduct({ ids: [id] });
       } catch (ex) {
-        expect(ex.code).toBe("PRODUCT_NOT_FOUND");
+        expect(ex.code).toBe("PRODUCTS_NOT_FOUND");
       }
 
       expect(database.findByIds).toHaveBeenCalledTimes(1);
@@ -33,7 +33,7 @@ describe("Validation", () => {
         ids: [id],
         formatDocumentAs: "private",
       });
-      expect(database.deleteById).not.toHaveBeenCalled();
+      expect(database.deleteByIds).not.toHaveBeenCalled();
     });
   }
 });
@@ -43,15 +43,15 @@ describe("Functionality", () => {
     database.findByIds.mockResolvedValueOnce([sampleProduct]);
     const id = sampleProduct._id;
 
-    const deleted = await deleteProduct({ id });
-    expect(deleted).toEqual(sampleProduct);
+    const deleted = await deleteProduct({ ids: [id] });
+    expect(deleted).toEqual([sampleProduct]);
 
     expect(database.findByIds).toHaveBeenCalledTimes(1);
-    expect(database.deleteById).toHaveBeenCalledTimes(1);
+    expect(database.deleteByIds).toHaveBeenCalledTimes(1);
     expect(database.findByIds).toHaveBeenCalledWith({
       ids: [id],
       formatDocumentAs: "private",
     });
-    expect(database.deleteById).toHaveBeenCalledWith({ id });
+    expect(database.deleteByIds).toHaveBeenCalledWith({ ids: [id] });
   });
 });

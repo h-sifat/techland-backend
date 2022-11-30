@@ -8,11 +8,11 @@ import type { PaginationObject } from "../../data-access/util";
 import type { CategoryPrivateInterface } from "../../entities/product-category/interface";
 
 export interface DBQueryMethodArgs {
-  findById: {
+  findByIds: {
     ids: string[];
     formatDocumentAs: "public" | "private";
   };
-  deleteById: { id: string };
+  deleteByIds: { ids: string[] };
   findByName: { name: string };
   updateById: { id: string; product: ProductPrivateInterface };
   find: {
@@ -53,13 +53,13 @@ type ProductResponse = Promise<Readonly<ProductPrivateInterface> | null>;
 export interface ProductDatabase {
   insert(arg: ProductPrivateInterface): Promise<void>;
 
-  findByIds<Arg extends DBQueryMethodArgs["findById"]>(
+  findByIds<Arg extends DBQueryMethodArgs["findByIds"]>(
     arg: Arg
   ): Arg["formatDocumentAs"] extends "public"
     ? Promise<Readonly<ProductPublicInterface>[]>
     : Promise<Readonly<ProductPrivateInterface>[]>;
 
-  deleteById(arg: DBQueryMethodArgs["deleteById"]): Promise<void>;
+  deleteByIds(arg: DBQueryMethodArgs["deleteByIds"]): Promise<void>;
   findByName(arg: DBQueryMethodArgs["findByName"]): ProductResponse;
 
   updateById(

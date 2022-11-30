@@ -3,27 +3,28 @@ import type { ProductDatabase } from "../interfaces/product-db";
 import type { ProductService } from "../interfaces/product-service";
 
 export interface MakeDeleteProduct_Argument {
-  database: Pick<ProductDatabase, "findByIds" | "deleteById">;
+  database: Pick<ProductDatabase, "findByIds" | "deleteByIds">;
 }
-export function makeDeleteProduct(
+export function makeDeleteProducts(
   factoryArg: MakeDeleteProduct_Argument
-): ProductService["removeProduct"] {
+): ProductService["deleteProducts"] {
   const { database } = factoryArg;
 
-  return async function deleteProduct(arg) {
-    const { id } = arg;
+  return async function deleteProducts(arg) {
+    const { ids } = arg;
 
     const products = await database.findByIds({
-      ids: [id],
+      ids,
       formatDocumentAs: "private",
     });
+
     if (!products.length)
       throw new EPP({
-        code: "PRODUCT_NOT_FOUND",
-        message: `No product found with the id: "${id}"`,
+        code: "PRODUCTS_NOT_FOUND",
+        message: `No products found with the ids`,
       });
 
-    await database.deleteById({ id });
-    return products[0];
+    await database.deleteByIds({ ids });
+    return products;
   };
 }
