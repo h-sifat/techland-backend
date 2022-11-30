@@ -9,7 +9,7 @@ const dbMethods = Object.freeze(Object.values(database));
 
 const editProductCategory = makeEditProductCategory({ database });
 const sampleCategory = ProductCategory.make({ name: "Accessories" });
-const readOptions = Object.freeze({ audience: "private" });
+const formatDocumentAs = "private";
 
 beforeEach(() => {
   dbMethods.forEach((method) => method.mockReset());
@@ -31,7 +31,7 @@ describe("Validation", () => {
       }
 
       expect(database.findById).toHaveBeenCalledTimes(1);
-      expect(database.findById).toHaveBeenCalledWith({ id }, readOptions);
+      expect(database.findById).toHaveBeenCalledWith({ id, formatDocumentAs });
       expect(database.updateById).not.toHaveBeenCalled();
     });
   }
@@ -53,7 +53,7 @@ describe("Validation", () => {
     }
 
     expect(database.findById).toHaveBeenCalledTimes(1);
-    expect(database.findById).toHaveBeenCalledWith({ id }, readOptions);
+    expect(database.findById).toHaveBeenCalledWith({ id, formatDocumentAs });
     expect(database.updateById).not.toHaveBeenCalled();
   });
 });

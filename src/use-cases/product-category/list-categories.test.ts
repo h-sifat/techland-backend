@@ -7,7 +7,6 @@ const database = Object.freeze({
 const dbMethods = Object.freeze(Object.values(database));
 
 const listProductCategories = makeListProductCategories({ database });
-const options = Object.freeze({ audience: "private" });
 
 beforeEach(() => {
   dbMethods.forEach((method) => method.mockReset());
@@ -18,10 +17,12 @@ describe("Functionality", () => {
     const mockCategories = deepFreezeStrict([{ a: 1 }, { b: 1 }]);
     database.findAll.mockResolvedValueOnce(mockCategories);
 
-    const productCategories = await listProductCategories(options);
+    const arg = Object.freeze({ formatDocumentAs: "private" });
+
+    const productCategories = await listProductCategories(arg);
     expect(productCategories).toEqual(mockCategories);
 
     expect(database.findAll).toHaveBeenCalledTimes(1);
-    expect(database.findAll).toHaveBeenCalledWith(options);
+    expect(database.findAll).toHaveBeenCalledWith(arg);
   });
 });

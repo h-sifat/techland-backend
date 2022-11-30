@@ -6,7 +6,7 @@ import type {
   DBQueryMethodArgs,
   ProductCategoryDatabase,
 } from "./product-category-db";
-import type { CategoryPrivateInterface } from "../../entities/product-category/interface";
+import type { CategoryInterface } from "../../entities/product-category/interface";
 
 export interface ServiceArguments {
   addCategory: { category: MakeCategory_Argument };
@@ -17,7 +17,7 @@ export interface ServiceArguments {
   findCategoryById: DBQueryMethodArgs["findById"];
 }
 
-type CategoryResponse = Promise<Readonly<CategoryPrivateInterface>>;
+type CategoryResponse = Promise<Readonly<CategoryInterface>>;
 export interface ProductCategoryService {
   listCategories: ProductCategoryDatabase["findAll"];
   findCategoryById: ProductCategoryDatabase["findById"];

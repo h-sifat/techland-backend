@@ -5,7 +5,7 @@ import type {
   ProductPublicInterface,
 } from "../../entities/product/interface";
 import type { PaginationObject } from "../../data-access/util";
-import type { CategoryPrivateInterface } from "../../entities/product-category/interface";
+import type { CategoryInterface } from "../../entities/product-category/interface";
 
 export interface DBQueryMethodArgs {
   findByIds: {
@@ -44,7 +44,7 @@ export interface FindResult<
   minPrice: number;
   brands: ProductBrand[];
   products: DocumentType[];
-  categories: Pick<CategoryPrivateInterface, "_id" | "name" | "parentId">;
+  categories: Pick<CategoryInterface, "_id" | "name" | "parentId">;
 }
 
 export interface ProductDatabase {

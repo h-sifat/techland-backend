@@ -1,4 +1,4 @@
-export interface CategoryPrivateInterface {
+export interface CategoryInterface {
   _id: string;
   hash: string;
   name: string;
@@ -9,7 +9,8 @@ export interface CategoryPrivateInterface {
   description: string | null;
 }
 
+export type CategoryPrivateInterface = CategoryInterface & { imageUrl: string };
 export type CategoryPublicInterface = Pick<
-  CategoryPrivateInterface,
+  CategoryInterface,
   "_id" | "parentId" | "name" | "description" | "createdAt"
 > & { imageUrl: string };

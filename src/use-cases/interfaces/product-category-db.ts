@@ -1,38 +1,43 @@
 import type {
+  CategoryInterface,
   CategoryPublicInterface,
   CategoryPrivateInterface,
 } from "../../entities/product-category/interface";
 
+interface FormatDocumentAs {
+  formatDocumentAs: "public" | "private";
+}
+
 export interface DBQueryMethodArgs {
-  findById: { id: string };
+  findAll: FormatDocumentAs;
   deleteById: { id: string };
   findByHash: { hash: string };
-  updateById: { id: string; category: CategoryPrivateInterface };
+  findById: { id: string } & FormatDocumentAs;
+  updateById: { id: string; category: CategoryInterface };
 }
 
 export interface ReadOptions {
   audience: "public" | "private";
 }
 
-export type FindResult<audience extends ReadOptions["audience"]> =
-  audience extends "public"
+export type FormatDocument<Arg extends FormatDocumentAs> =
+  Arg["formatDocumentAs"] extends "public"
     ? CategoryPublicInterface
     : CategoryPrivateInterface;
 
 export interface ProductCategoryDatabase {
-  findAll<Options extends ReadOptions>(
-    options: Options
-  ): Promise<Readonly<FindResult<Options["audience"]>>[]>;
-  findById<Options extends ReadOptions>(
-    arg: DBQueryMethodArgs["findById"],
-    options: Options
-  ): Promise<Readonly<FindResult<Options["audience"]>> | null>;
+  findAll<Arg extends DBQueryMethodArgs["findAll"]>(
+    arg: Arg
+  ): Promise<Readonly<FormatDocument<Arg>>[]>;
+  findById<Arg extends DBQueryMethodArgs["findById"]>(
+    arg: Arg
+  ): Promise<Readonly<FormatDocument<Arg>> | null>;
   findByHash(
     arg: DBQueryMethodArgs["findByHash"]
-  ): Promise<Readonly<CategoryPrivateInterface> | null>;
+  ): Promise<Readonly<CategoryInterface> | null>;
   updateById(
     arg: DBQueryMethodArgs["updateById"]
-  ): Promise<Readonly<CategoryPrivateInterface>>;
-  insert(arg: CategoryPrivateInterface): Promise<void>;
+  ): Promise<Readonly<CategoryInterface>>;
+  insert(arg: CategoryInterface): Promise<void>;
   deleteById(arg: DBQueryMethodArgs["deleteById"]): Promise<void>;
 }

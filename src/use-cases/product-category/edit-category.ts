@@ -15,7 +15,10 @@ export function makeEditProductCategory(
   return async function editCategory(arg) {
     const { id, changes } = arg;
 
-    const category = await database.findById({ id }, { audience: "private" });
+    const category = await database.findById({
+      id,
+      formatDocumentAs: "private",
+    });
     if (!category)
       throw new EPP({
         code: "CATEGORY_NOT_FOUND",
