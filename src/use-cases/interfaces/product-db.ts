@@ -58,9 +58,7 @@ export interface ProductDatabase {
 
   deleteByIds(arg: DBQueryMethodArgs["deleteByIds"]): Promise<void>;
 
-  updateById(
-    arg: DBQueryMethodArgs["updateById"]
-  ): Promise<Readonly<ProductPrivateInterface>>;
+  updateById(arg: DBQueryMethodArgs["updateById"]): Promise<void>;
 
   find<Arg extends DBQueryMethodArgs["find"]>(
     arg: Arg
