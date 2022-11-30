@@ -37,7 +37,7 @@ const find = makeFindProducts({
   deepFreeze: deepFreezeStrict,
   productCategoriesCollectionName,
   makeAggregationPipelineToGetProducts,
-  productsCollection: collection as any,
+  getCollection: () => collection as any,
 });
 
 const originalProductFieldNames = makeFindArgsPartial.originalProductFieldNames;

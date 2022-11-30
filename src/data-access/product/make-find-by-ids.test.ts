@@ -4,7 +4,7 @@ const toArray = jest.fn();
 const aggregate = jest.fn(() => Object.freeze({ toArray }));
 const collection = Object.freeze({ aggregate });
 
-const findByIds = makeFindByIds({ collection: <any>collection });
+const findByIds = makeFindByIds({ getCollection: () => <any>collection });
 
 beforeEach(() => {
   toArray.mockClear();

@@ -4,7 +4,7 @@ const collection = Object.freeze({
   insertOne: jest.fn(),
 });
 
-const insert = makeInsert({ collection: <any>collection });
+const insert = makeInsert({ getCollection: () => <any>collection });
 
 beforeEach(() => {
   Object.values(collection).forEach((method) => method.mockReset());

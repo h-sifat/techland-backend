@@ -31,17 +31,17 @@ export const findByIdsProjectObjects = deepFreezeStrict({
 } as const);
 
 export interface MakeFindByIds_Argument {
-  collection: Pick<Collection, "aggregate">;
+  getCollection(): Pick<Collection, "aggregate">;
 }
 export function makeFindByIds(
   factoryArg: MakeFindByIds_Argument
 ): ProductDatabase["findByIds"] {
-  const { collection } = factoryArg;
+  const { getCollection } = factoryArg;
 
   return async function findByIds(arg) {
     const { ids, formatDocumentAs } = arg;
 
-    const products = await collection
+    const products = await getCollection()
       .aggregate([
         { $match: { _id: { $in: ids } } },
         { $project: findByIdsProjectObjects[formatDocumentAs] },

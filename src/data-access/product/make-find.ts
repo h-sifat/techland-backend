@@ -58,7 +58,7 @@ const errorMap = makeZodErrorMap({ objectName: "findProductsArgument" });
 // @TODO: fix poor variable naming
 export interface MakeFind_Argument {
   deepFreeze<T>(o: T): T;
-  productsCollection: Collection<ProductPrivateInterface>;
+  getCollection(): Pick<Collection<ProductPrivateInterface>, "aggregate">;
 
   imageUrlPrefix: string;
   metaFieldNames: {
@@ -97,7 +97,7 @@ export function makeFindProducts(
 ): ProductDatabase["find"] {
   const {
     deepFreeze,
-    productsCollection,
+    getCollection,
 
     metaFieldName,
     imageUrlPrefix,
@@ -131,7 +131,7 @@ export function makeFindProducts(
       productCategoriesCollectionName,
     });
 
-    const resultArray = await productsCollection
+    const resultArray = await getCollection()
       .aggregate(aggregationPipeline)
       .toArray();
 
