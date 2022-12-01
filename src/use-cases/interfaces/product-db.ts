@@ -66,10 +66,10 @@ export interface FindResult<
   categories: Pick<CategoryInterface, "_id" | "name" | "parentId">;
 }
 
-type SimilarProductsResult = (Pick<
+export type SimilarProductsResult = (Pick<
   ProductPublicInterface,
   "_id" | "name" | "brand" | "price" | "priceUnit"
-> & { imageUrl: string })[];
+> & { imageUrl: string; score: number })[];
 
 export type GetSearchSuggestionsResult = (Pick<
   MinifiedPublicProductInterface,
