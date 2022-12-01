@@ -1,5 +1,5 @@
 import deepFreezeStrict from "deep-freeze-strict";
-import { makeFindById } from "./make-find-by-id";
+import { makeFindById } from "./find-by-id";
 
 const collection = Object.freeze({
   findOne: jest.fn(),

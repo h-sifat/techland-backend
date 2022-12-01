@@ -1,5 +1,5 @@
 import deepFreezeStrict from "deep-freeze-strict";
-import { makeFindAll } from "./make-find-all";
+import { makeFindById } from "./find-by-id";
 import { makeCategoryProjectStages } from "./util";
 
 const toArray = jest.fn();
@@ -9,7 +9,7 @@ const collection = Object.freeze({ aggregate });
 const imageUrlPrefix = "https://techland.com/images";
 const projectStages = makeCategoryProjectStages({ imageUrlPrefix });
 
-const findAll = makeFindAll({
+const findById = makeFindById({
   deepFreeze: deepFreezeStrict,
   categoryProjectStages: projectStages,
   getCollection: () => <any>collection,
@@ -21,14 +21,22 @@ beforeEach(() => {
 });
 
 describe("Functionality", () => {
+  const id = "a";
+
   it.each([
     {
-      arg: { formatDocumentAs: "public" },
-      expectedAggregationPipeline: [{ $project: projectStages["public"] }],
+      arg: { id, formatDocumentAs: "public" },
+      expectedAggregationPipeline: [
+        { $match: { _id: id } },
+        { $project: projectStages["public"] },
+      ],
     },
     {
-      arg: { formatDocumentAs: "private" },
-      expectedAggregationPipeline: [{ $project: projectStages["private"] }],
+      arg: { id, formatDocumentAs: "private" },
+      expectedAggregationPipeline: [
+        { $match: { _id: id } },
+        { $project: projectStages["private"] },
+      ],
     },
   ] as const)(
     `calls the aggregate method with the right pipeline`,
@@ -36,9 +44,9 @@ describe("Functionality", () => {
       const fakeResponse = [{ a: 1 }];
       toArray.mockResolvedValueOnce(fakeResponse);
 
-      const result = await findAll(arg);
-      expect(result).toEqual(fakeResponse);
-      expect(Object.isFrozen(fakeResponse)).toBeTruthy();
+      const result = await findById(arg);
+      expect(result).toEqual(fakeResponse[0]);
+      expect(Object.isFrozen(fakeResponse[0])).toBeTruthy();
 
       expect(aggregate).toHaveBeenCalledTimes(1);
       expect(aggregate).toHaveBeenCalledWith(expectedAggregationPipeline);

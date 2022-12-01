@@ -1,4 +1,4 @@
-import { findByIdsProjectObjects, makeFindByIds } from "./make-find-by-ids";
+import { findByIdsProjectObjects, makeFindByIds } from "./find-by-ids";
 
 const toArray = jest.fn();
 const aggregate = jest.fn(() => Object.freeze({ toArray }));

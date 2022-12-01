@@ -1,5 +1,5 @@
 import deepFreezeStrict from "deep-freeze-strict";
-import { makeFindAll } from "./make-find-all";
+import { makeFindAll } from "./find-all";
 
 const toArray = jest.fn();
 const find = jest.fn(() => ({ toArray }));

@@ -1,4 +1,4 @@
-import { makeUpdateById } from "./make-update-by-id";
+import { makeUpdateById } from "./update-by-id";
 
 const collection = Object.freeze({
   replaceOne: jest.fn(),
@@ -13,10 +13,10 @@ beforeEach(() => {
 describe("Functionality", () => {
   it(`call the collection.replaceOne with the given _id and document`, async () => {
     const id = "abc";
-    const product = Object.freeze({ name: "XFX GPU" }) as any;
+    const category = Object.freeze({ name: "Processor" }) as any;
 
-    await updateById({ id, document: product });
+    await updateById({ id, category });
     expect(collection.replaceOne).toHaveBeenCalledTimes(1);
-    expect(collection.replaceOne).toHaveBeenCalledWith({ _id: id }, product);
+    expect(collection.replaceOne).toHaveBeenCalledWith({ _id: id }, category);
   });
 });

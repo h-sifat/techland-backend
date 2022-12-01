@@ -1,4 +1,4 @@
-import { makeInsert } from "./make-insert";
+import { makeInsert } from "./insert";
 
 const collection = Object.freeze({
   insertOne: jest.fn(),

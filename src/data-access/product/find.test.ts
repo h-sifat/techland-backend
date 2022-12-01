@@ -6,7 +6,7 @@ import {
   makeMainImageUrlGeneratorStage,
   makeAllProductCategoriesLookupStage,
   buildMakeAggregationPipelineToGetProducts,
-} from "./make-find";
+} from "./find";
 import { z } from "zod";
 import { inspect } from "util";
 import { makeFindArgsPartial } from ".";

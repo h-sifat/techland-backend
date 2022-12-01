@@ -1,4 +1,4 @@
-import { makeDeleteByIds } from "./make-delete-by-ids";
+import { makeDeleteByIds } from "./delete-by-ids";
 
 const collection = Object.freeze({
   deleteMany: jest.fn(),

@@ -1,4 +1,4 @@
-import { makeUpdateById } from "./make-update-by-id";
+import { makeUpdateById } from "./update-by-id";
 
 const collection = Object.freeze({
   replaceOne: jest.fn(),
@@ -15,7 +15,7 @@ describe("Functionality", () => {
     const id = "abc";
     const product = Object.freeze({ name: "XFX GPU" }) as any;
 
-    await updateById({ id, product });
+    await updateById({ id, document: product });
     expect(collection.replaceOne).toHaveBeenCalledTimes(1);
     expect(collection.replaceOne).toHaveBeenCalledWith({ _id: id }, product);
   });
