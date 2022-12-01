@@ -7,6 +7,25 @@ import type {
 import type { PaginationObject } from "../../data-access/util";
 import type { CategoryInterface } from "../../entities/product-category/interface";
 
+interface FormatDocumentAs {
+  formatDocumentAs: "public" | "private";
+}
+
+interface FindProductArg extends FormatDocumentAs {
+  brandIds?: string[];
+  categoryId?: string;
+  pagination: PaginationObject;
+  priceRange?: { min?: number; max?: number };
+  sortBy?: { price: "ascending" | "descending" };
+}
+
+interface SearchProductsArg extends FormatDocumentAs {
+  query: string;
+  brandId?: string;
+  categoryId?: string;
+  pagination: PaginationObject;
+}
+
 export interface DBQueryMethodArgs {
   findByIds: {
     ids: string[];
@@ -14,14 +33,14 @@ export interface DBQueryMethodArgs {
   };
   deleteByIds: { ids: string[] };
   updateById: { id: string; product: ProductPrivateInterface };
-  find: {
-    brandIds?: string[];
-    categoryId?: string | null;
-    pagination: PaginationObject;
-    formatDocumentAs: "public" | "private";
-    priceRange?: { min?: number; max?: number };
-    sortBy?: { price: "ascending" | "descending" };
-  };
+  find: FindProductArg;
+
+  searchProducts: SearchProductsArg;
+  getSearchSuggestions: Pick<
+    SearchProductsArg,
+    "categoryId" | "brandId" | "query"
+  >;
+  findRelatedProducts: { product: ProductPrivateInterface };
 }
 
 export type MinifiedProductCommonFields = Pick<
@@ -65,4 +84,16 @@ export interface ProductDatabase {
   ): Arg["formatDocumentAs"] extends "public"
     ? Promise<FindResult<MinifiedPublicProductInterface>>
     : Promise<FindResult<MinifiedPrivateProductInterface>>;
+
+  searchProducts<Arg extends DBQueryMethodArgs["searchProducts"]>(
+    arg: Arg
+  ): Arg["formatDocumentAs"] extends "public"
+    ? Promise<MinifiedPublicProductInterface[]>
+    : Promise<MinifiedPrivateProductInterface[]>;
+
+  getSearchSuggestions(
+    arg: DBQueryMethodArgs["getSearchSuggestions"]
+  ): Promise<
+    Pick<MinifiedPublicProductInterface, "_id" | "name" | "imageUrl">[]
+  >;
 }

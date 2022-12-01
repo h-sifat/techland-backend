@@ -20,4 +20,5 @@ export interface ProductService {
   findProductByIds: ProductDatabase["findByIds"];
   addProduct(arg: ServiceArguments["addProduct"]): ProductResponse;
   editProduct(arg: ServiceArguments["editProduct"]): ProductResponse;
+  searchProducts: ProductDatabase["searchProducts"];
 }
