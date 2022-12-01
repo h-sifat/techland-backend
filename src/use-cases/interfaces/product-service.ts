@@ -14,11 +14,13 @@ type ProductResponse = Promise<Readonly<ProductPrivateInterface>>;
 
 export interface ProductService {
   listProducts: ProductDatabase["find"];
+  findProductByIds: ProductDatabase["findByIds"];
+  searchProducts: ProductDatabase["searchProducts"];
+  getSearchSuggestions: ProductDatabase["getSearchSuggestions"];
+  addProduct(arg: ServiceArguments["addProduct"]): ProductResponse;
+  editProduct(arg: ServiceArguments["editProduct"]): ProductResponse;
+
   deleteProducts(
     arg: DBQueryMethodArgs["deleteByIds"]
   ): Promise<ProductPrivateInterface[]>;
-  findProductByIds: ProductDatabase["findByIds"];
-  addProduct(arg: ServiceArguments["addProduct"]): ProductResponse;
-  editProduct(arg: ServiceArguments["editProduct"]): ProductResponse;
-  searchProducts: ProductDatabase["searchProducts"];
 }

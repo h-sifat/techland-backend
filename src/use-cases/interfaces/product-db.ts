@@ -39,7 +39,7 @@ export interface DBQueryMethodArgs {
   getSearchSuggestions: Pick<
     SearchProductsArg,
     "categoryId" | "brandId" | "query"
-  >;
+  > & { count: number };
   findRelatedProducts: { product: ProductPrivateInterface };
 }
 
