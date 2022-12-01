@@ -3,8 +3,8 @@ export interface MakeMainImageUrlGeneratorStage_Argument {
   fieldNames: {
     images: string;
     imageId: string;
-    imageUrl: string;
     imageIsMain: string;
+    generatedUrl: string;
   };
 }
 
@@ -18,7 +18,7 @@ export function makeMainImageUrlGeneratorStage(
   const {
     images: imagesFieldName,
     imageId: imageIdFieldName,
-    imageUrl: imageUrlFieldName,
+    generatedUrl: imageUrlFieldName,
     imageIsMain: imageIsMainFieldName,
   } = arg.fieldNames;
 

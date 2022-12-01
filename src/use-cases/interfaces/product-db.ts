@@ -71,6 +71,11 @@ type SimilarProductsResult = (Pick<
   "_id" | "name" | "brand" | "price" | "priceUnit"
 > & { imageUrl: string })[];
 
+export type GetSearchSuggestionsResult = (Pick<
+  MinifiedPublicProductInterface,
+  "_id" | "name" | "imageUrl"
+> & { score: number })[];
+
 export interface ProductDatabase {
   insert(arg: ProductPrivateInterface): Promise<void>;
 
@@ -98,9 +103,7 @@ export interface ProductDatabase {
 
   getSearchSuggestions(
     arg: DBQueryMethodArgs["getSearchSuggestions"]
-  ): Promise<
-    Pick<MinifiedPublicProductInterface, "_id" | "name" | "imageUrl">[]
-  >;
+  ): Promise<GetSearchSuggestionsResult>;
 
   findSimilarProducts(
     arg: DBQueryMethodArgs["findSimilarProducts"]

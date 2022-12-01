@@ -8,7 +8,7 @@ describe("makeMainImageUrlGeneratorStage", () => {
     const fieldNames = Object.freeze({
       images: "images",
       imageId: "id",
-      imageUrl: "imageUrl",
+      generatedUrl: "imageUrl",
       imageIsMain: "isMain",
     });
     const imageUrlPrefix = "https://techland.com/images/";
@@ -20,7 +20,7 @@ describe("makeMainImageUrlGeneratorStage", () => {
 
     expect(mainImageUrlGeneratorStage).toEqual({
       $set: {
-        [fieldNames.imageUrl]: {
+        [fieldNames.generatedUrl]: {
           // select the main image id and generate url
           $concat: [
             imageUrlPrefix,

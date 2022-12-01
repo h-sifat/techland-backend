@@ -215,7 +215,10 @@ export function buildMakeAggregationPipelineToGetProducts(
     // each product document
     const mainImageUrlGeneratorStage = makeMainImageUrlGeneratorStage({
       imageUrlPrefix: arg.imageUrlPrefix,
-      fieldNames: arg.originalProductFieldNames,
+      fieldNames: {
+        ...arg.originalProductFieldNames,
+        generatedUrl: arg.originalProductFieldNames.imageUrl,
+      },
     });
 
     // Reshapes product documents based on `formatDocumentAs` option
