@@ -23,4 +23,9 @@ export interface ProductService {
   deleteProducts(
     arg: DBQueryMethodArgs["deleteByIds"]
   ): Promise<ProductPrivateInterface[]>;
+
+  findSimilarProducts(arg: {
+    id: string;
+    count: number;
+  }): ReturnType<ProductDatabase["findSimilarProducts"]>;
 }

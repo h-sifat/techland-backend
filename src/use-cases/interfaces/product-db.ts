@@ -40,7 +40,7 @@ export interface DBQueryMethodArgs {
     SearchProductsArg,
     "categoryId" | "brandId" | "query"
   > & { count: number };
-  findRelatedProducts: { product: ProductPrivateInterface };
+  findSimilarProducts: { product: ProductPrivateInterface; count: number };
 }
 
 export type MinifiedProductCommonFields = Pick<
@@ -65,6 +65,11 @@ export interface FindResult<
   products: DocumentType[];
   categories: Pick<CategoryInterface, "_id" | "name" | "parentId">;
 }
+
+type SimilarProductsResult = (Pick<
+  ProductPublicInterface,
+  "_id" | "name" | "brand" | "price" | "priceUnit"
+> & { imageUrl: string })[];
 
 export interface ProductDatabase {
   insert(arg: ProductPrivateInterface): Promise<void>;
@@ -96,4 +101,8 @@ export interface ProductDatabase {
   ): Promise<
     Pick<MinifiedPublicProductInterface, "_id" | "name" | "imageUrl">[]
   >;
+
+  findSimilarProducts(
+    arg: DBQueryMethodArgs["findSimilarProducts"]
+  ): Promise<SimilarProductsResult>;
 }
