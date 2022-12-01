@@ -35,9 +35,7 @@ export interface ProductCategoryDatabase {
   findByHash(
     arg: DBQueryMethodArgs["findByHash"]
   ): Promise<Readonly<CategoryInterface> | null>;
-  updateById(
-    arg: DBQueryMethodArgs["updateById"]
-  ): Promise<Readonly<CategoryInterface>>;
+  updateById(arg: DBQueryMethodArgs["updateById"]): Promise<void>;
   insert(arg: CategoryInterface): Promise<void>;
   deleteById(arg: DBQueryMethodArgs["deleteById"]): Promise<void>;
 }
