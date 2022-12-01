@@ -50,7 +50,7 @@ export function makeFindSimilarProducts(
             },
           },
         },
-        { $match: { _id: { $ne: product._id } } },
+        { $match: { _id: { $ne: product._id }, isHidden: { $eq: false } } },
         {
           $project: {
             _id: 1,

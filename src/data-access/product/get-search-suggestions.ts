@@ -50,6 +50,7 @@ export function makeGetSearchSuggestions(
             },
           },
         },
+        { $match: { isHidden: { $eq: false } } },
         {
           $project: {
             _id: 1,
