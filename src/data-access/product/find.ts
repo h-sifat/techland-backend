@@ -6,6 +6,10 @@ import {
 import { z } from "zod";
 import { isNever, makeZodErrorMap } from "../../common/util/zod";
 
+import type {
+  MakeMainImageUrlGeneratorStage,
+  MakeAllProductCategoriesLookupStage,
+} from "./util";
 import type { Collection } from "mongodb";
 import type { ProductDatabase } from "../../use-cases/interfaces/product-db";
 import type { DBQueryMethodArgs } from "../../use-cases/interfaces/product-db";
@@ -13,6 +17,8 @@ import type { MissingOrUnknownPropertiesInSchema } from "../../common/util/zod";
 import type { ProductPrivateInterface } from "../../entities/product/interface";
 
 // =====================[Validation Schema]=======================
+
+// @TODO move this validation logic to the controller-layer
 export const FindProductArgumentSchema = z
   .object({
     brandIds: z.array(z.string().min(1)).min(1).optional(),
@@ -170,15 +176,11 @@ export type MakeAggregationPipeline_Argument = DBQueryMethodArgs["find"] &
   >;
 
 export interface BuildMakeAggregationPipelineToGetProducts_Argument {
-  makeAllProductCategoriesLookupStage(
-    arg: MakeAllCategoriesLookupStage_Argument
-  ): object;
-  makeMainImageUrlGeneratorStage(
-    arg: MakeMainImageUrlGeneratorStage_Argument
-  ): object;
+  makeMainImageUrlGeneratorStage: MakeMainImageUrlGeneratorStage;
   makeProductsSortStage(arg: MakeProductsSortStage_Argument): object;
   makeProductsPaginationStagesArray: MakeAggregationStagesForPagination;
   makeProductsFilterStage(arg: MakeProductsFilterStage_Argument): object;
+  makeAllProductCategoriesLookupStage: MakeAllProductCategoriesLookupStage;
   makeProductsProjectStage(arg: MakeProductsProjectStage_Argument): object;
 }
 
@@ -211,13 +213,20 @@ export function buildMakeAggregationPipelineToGetProducts(
 
     // selects the main image and add a `imageUrlFieldName` field in
     // each product document
-    const mainImageUrlGeneratorStage = makeMainImageUrlGeneratorStage(arg);
+    const mainImageUrlGeneratorStage = makeMainImageUrlGeneratorStage({
+      imageUrlPrefix: arg.imageUrlPrefix,
+      fieldNames: arg.originalProductFieldNames,
+    });
 
     // Reshapes product documents based on `formatDocumentAs` option
     const productsProjectStage = makeProductsProjectStage(arg);
 
     // retrieves all product categories
-    const categoriesLookupStage = makeAllProductCategoriesLookupStage(arg);
+    const categoriesLookupStage = makeAllProductCategoriesLookupStage({
+      collectionName: arg.productCategoriesCollectionName,
+      addCategoriesAs: arg.productCategoriesFieldName,
+      pickFields: arg.formattedProductCategoryFields,
+    });
 
     // paginates products
     const productsPaginationStagesArray = makeProductsPaginationStagesArray(
@@ -275,87 +284,6 @@ export function buildMakeAggregationPipelineToGetProducts(
 
     return pipeline;
   };
-}
-
-export type MakeAllCategoriesLookupStage_Argument = Pick<
-  MakeAggregationPipeline_Argument,
-  | "productCategoriesFieldName"
-  | "formattedProductCategoryFields"
-  | "productCategoriesCollectionName"
->;
-
-export function makeAllProductCategoriesLookupStage(
-  arg: MakeAllCategoriesLookupStage_Argument
-) {
-  return {
-    $lookup: {
-      from: arg.productCategoriesCollectionName,
-      as: arg.productCategoriesFieldName,
-      pipeline: [
-        // this stage generates: {$project: {name: 1, parentId: 1 ...}}
-        {
-          $project: arg.formattedProductCategoryFields.reduce(
-            (projectObject, field) => {
-              projectObject[field] = 1;
-              return projectObject;
-            },
-            {} as any
-          ),
-        },
-      ],
-    },
-  };
-}
-
-export type MakeMainImageUrlGeneratorStage_Argument = Pick<
-  MakeAggregationPipeline_Argument,
-  "imageUrlPrefix" | "originalProductFieldNames"
->;
-export function makeMainImageUrlGeneratorStage(
-  arg: MakeMainImageUrlGeneratorStage_Argument
-) {
-  const {
-    images: imagesFieldName,
-    imageId: imageIdFieldName,
-    imageUrl: imageUrlFieldName,
-    imageIsMain: imageIsMainFieldName,
-  } = arg.originalProductFieldNames;
-
-  /**
-   * The following scary lines are doing exactly the same thing as
-   * the following code snippet:
-   *
-   * ```js
-   * const id = product.images.filter(image => image[imageIsMainFieldName])[0]
-   * product[imageUrlFieldName] = imageUrlPrefix + id
-   * ```
-   * */
-  const setStage = {
-    $set: {
-      [imageUrlFieldName]: {
-        // select the main image id and generate url
-        $concat: [
-          arg.imageUrlPrefix,
-          {
-            $getField: {
-              input: {
-                $first: {
-                  $filter: {
-                    input: `$${imagesFieldName}`,
-                    as: "image",
-                    cond: { $eq: [`$$image.${imageIsMainFieldName}`, true] },
-                  },
-                }, // end $first
-              },
-              field: imageIdFieldName,
-            }, // end $getField
-          },
-        ],
-      }, // end imageUrl
-    },
-  };
-
-  return setStage;
 }
 
 export type MakeProductsFilterStage_Argument = Pick<

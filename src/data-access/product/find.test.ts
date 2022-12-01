@@ -3,16 +3,19 @@ import {
   makeProductsSortStage,
   makeProductsFilterStage,
   makeProductsProjectStage,
-  makeMainImageUrlGeneratorStage,
-  makeAllProductCategoriesLookupStage,
   buildMakeAggregationPipelineToGetProducts,
 } from "./find";
+
 import { z } from "zod";
 import { inspect } from "util";
 import { makeFindArgsPartial } from ".";
 import deepFreezeStrict from "deep-freeze-strict";
-import { DBQueryMethodArgs } from "../../use-cases/interfaces/product-db";
 import { makePaginationStagesArray } from "../util";
+import { DBQueryMethodArgs } from "../../use-cases/interfaces/product-db";
+import {
+  makeMainImageUrlGeneratorStage,
+  makeAllProductCategoriesLookupStage,
+} from "./util";
 
 const toArray = jest.fn();
 const aggregate = jest.fn(() => Object.freeze({ toArray }));
@@ -245,85 +248,6 @@ describe("makeProductsFilterStage", () => {
   });
 });
 
-describe("makeMainImageUrlGeneratorStage", () => {
-  it(`create a $set stage to create the mainImageUrl`, () => {
-    const {
-      images: imagesFieldName,
-      imageId: imageIdFieldName,
-      imageUrl: imageUrlFieldName,
-      imageIsMain: imageIsMainFieldName,
-    } = originalProductFieldNames;
-    const imageUrlPrefix = "https://techland.com/images/";
-
-    const mainImageUrlGeneratorStage = makeMainImageUrlGeneratorStage({
-      imageUrlPrefix,
-      originalProductFieldNames,
-    });
-
-    expect(mainImageUrlGeneratorStage).toEqual({
-      $set: {
-        [imageUrlFieldName]: {
-          // select the main image id and generate url
-          $concat: [
-            imageUrlPrefix,
-            {
-              $getField: {
-                input: {
-                  $first: {
-                    $filter: {
-                      input: `$${imagesFieldName}`,
-                      as: "image",
-                      cond: { $eq: [`$$image.${imageIsMainFieldName}`, true] },
-                    },
-                  }, // end $first
-                },
-                field: imageIdFieldName,
-              }, // end $getField
-            },
-          ],
-        }, // end imageUrl
-      },
-    });
-  });
-});
-
-describe("makeAllCategoriesLookupStage", () => {
-  it(`makes a $lookup stage from product_categories`, () => {
-    const productCategoriesFieldName = "categories";
-    const productCategoriesCollectionName = "product_categories";
-    const formattedProductCategoryFields = Object.freeze([
-      "_id",
-      "name",
-      "parentId",
-    ]) as any;
-
-    const lookupCategoriesStage = makeAllProductCategoriesLookupStage({
-      productCategoriesFieldName,
-      productCategoriesCollectionName,
-      formattedProductCategoryFields,
-    });
-
-    expect(lookupCategoriesStage).toEqual({
-      $lookup: {
-        from: productCategoriesCollectionName,
-        as: productCategoriesFieldName,
-        pipeline: [
-          // this stage generates: {$project: {name: 1, parentId: 1 ...}}
-          {
-            $project: formattedProductCategoryFields.reduce(
-              (projectObject: any, field: any) => {
-                projectObject[field] = 1;
-                return projectObject;
-              },
-              {} as any
-            ),
-          },
-        ],
-      },
-    });
-  });
-});
-
 describe("makeAggregationPipelineToGetProducts", () => {
   it(`hopefully it creates the long and complex aggregation pipeline`, () => {
     const categoryId = "oh_hi!";
@@ -344,6 +268,9 @@ describe("makeAggregationPipelineToGetProducts", () => {
 
     const { originalProductFieldNames } = makeFindArgsPartial;
 
+    // @TODO replace the actual pipeline stages with their respective
+    // generator functions, so that, changes to any stage doesn't break
+    // this test
     expect(pipeline).toEqual([
       { $match: { [originalProductFieldNames.categoryId]: "oh_hi!" } },
       {
