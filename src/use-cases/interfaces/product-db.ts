@@ -54,15 +54,17 @@ export type MinifiedPrivateProductInterface = MinifiedProductCommonFields & {
 };
 
 export interface FindResult<
-  DocumentType extends
-    | MinifiedPublicProductInterface
-    | MinifiedPrivateProductInterface
+  Format extends FormatDocumentAs,
+  PublicDoc = MinifiedPublicProductInterface,
+  PrivateDoc = MinifiedPrivateProductInterface
 > {
   count: number;
   maxPrice: number;
   minPrice: number;
   brands: ProductBrand[];
-  products: DocumentType[];
+  products: Format["formatDocumentAs"] extends "public"
+    ? PublicDoc
+    : PrivateDoc;
   categories: Pick<CategoryInterface, "_id" | "name" | "parentId">;
 }
 
@@ -91,15 +93,19 @@ export interface ProductDatabase {
 
   find<Arg extends DBQueryMethodArgs["find"]>(
     arg: Arg
-  ): Arg["formatDocumentAs"] extends "public"
-    ? Promise<FindResult<MinifiedPublicProductInterface>>
-    : Promise<FindResult<MinifiedPrivateProductInterface>>;
-
+  ): Promise<FindResult<Arg>>;
   searchProducts<Arg extends DBQueryMethodArgs["searchProducts"]>(
     arg: Arg
-  ): Arg["formatDocumentAs"] extends "public"
-    ? Promise<MinifiedPublicProductInterface[]>
-    : Promise<MinifiedPrivateProductInterface[]>;
+  ): Promise<
+    Omit<
+      FindResult<
+        Arg,
+        MinifiedPublicProductInterface & { score: number },
+        MinifiedPrivateProductInterface & { score: number }
+      >,
+      "brands"
+    >
+  >;
 
   getSearchSuggestions(
     arg: DBQueryMethodArgs["getSearchSuggestions"]
