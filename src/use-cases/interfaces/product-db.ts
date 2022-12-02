@@ -13,7 +13,7 @@ interface FormatDocumentAs {
 
 interface FindProductArg extends FormatDocumentAs {
   brandIds?: string[];
-  categoryId?: string;
+  categoryIds?: string[];
   pagination: PaginationObject;
   priceRange?: { min?: number; max?: number };
   sortBy?: { price: "ascending" | "descending" };

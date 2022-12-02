@@ -71,8 +71,6 @@ describe("Functionality", () => {
     await searchProducts({ ...searchProductsArg, formatDocumentAs: "public" });
     const aggregationPipeline = (<any[][]>aggregate.mock.calls)[0][0] as any[];
 
-    console.dir(aggregationPipeline, { depth: null });
-
     expect(aggregationPipeline[1]).toEqual({
       $match: { isHidden: false },
     });

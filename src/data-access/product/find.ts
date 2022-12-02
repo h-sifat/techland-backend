@@ -22,7 +22,7 @@ import type { ProductPrivateInterface } from "../../entities/product/interface";
 export const FindProductArgumentSchema = z
   .object({
     brandIds: z.array(z.string().min(1)).min(1).optional(),
-    categoryId: z.string().min(1).optional(),
+    categoryIds: z.array(z.string().min(1)).default([]),
 
     priceRange: z
       .object({
@@ -184,6 +184,7 @@ export interface BuildMakeAggregationPipelineToGetProducts_Argument {
   makeProductsProjectStage(arg: MakeProductsProjectStage_Argument): object;
 }
 
+// Looks like I've over-engineered this function 😅
 export function buildMakeAggregationPipelineToGetProducts(
   factoryArg: BuildMakeAggregationPipelineToGetProducts_Argument
 ) {
@@ -237,16 +238,19 @@ export function buildMakeAggregationPipelineToGetProducts(
     );
 
     // ==============[Building the Pipeline]=======================
-    const pipeline: any[] = arg.categoryId
-      ? // filter by specific category if categoryId is present
-        [
-          {
-            $match: {
-              [arg.originalProductFieldNames.categoryId]: arg.categoryId,
+    const pipeline: any[] =
+      arg.categoryIds && arg.categoryIds.length
+        ? // filter by specific category if categoryId is present
+          [
+            {
+              $match: {
+                [arg.originalProductFieldNames.categoryId]: {
+                  $in: arg.categoryIds,
+                },
+              },
             },
-          },
-        ]
-      : [];
+          ]
+        : [];
 
     const { price: priceFieldName, brand: brandFieldName } =
       arg.originalProductFieldNames;
@@ -280,7 +284,10 @@ export function buildMakeAggregationPipelineToGetProducts(
       { $facet: facetStage },
       {
         // ROOT.meta = ROOT.meta[0]
-        $project: { products: 1, meta: { $first: `$${arg.metaFieldName}` } },
+        $project: {
+          [arg.productsFieldName]: 1,
+          [arg.metaFieldName]: { $first: `$${arg.metaFieldName}` },
+        },
       },
       categoriesLookupStage
     );
@@ -320,7 +327,7 @@ export function makeProductsFilterStage(arg: MakeProductsFilterStage_Argument) {
   // don't show hidden products to the public
   if (arg.formatDocumentAs === "public") {
     const { isHidden: isHiddenFiledName } = arg.originalProductFieldNames;
-    filter[isHiddenFiledName] = { $eq: false };
+    filter[isHiddenFiledName] = false;
   }
 
   return { $match: filter };

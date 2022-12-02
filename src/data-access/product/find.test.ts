@@ -58,7 +58,7 @@ beforeEach(() => {
 describe("find: Argument Validation", () => {
   const invalidFindArgDataSet: Record<keyof DBQueryMethodArgs["find"], any[]> =
     deepFreezeStrict({
-      categoryId: ["", 12],
+      categoryIds: [[""], [12]],
       sortBy: [{}, { price: 1 }],
       formatDocumentAs: ["object", ""],
       brandIds: [[], [""], ["a", 1], "abc"],
@@ -186,7 +186,7 @@ describe("makeProductsFilterStage", () => {
     {
       arg: { originalProductFieldNames, formatDocumentAs: "public" },
       expectedResult: deepFreezeStrict({
-        $match: { [originalProductFieldNames.isHidden]: { $eq: false } },
+        $match: { [originalProductFieldNames.isHidden]: false },
       }),
       case: `with ${originalProductFieldNames.isHidden} !== false if "formatDocumentAs" is public`,
     },
@@ -225,7 +225,7 @@ describe("makeProductsFilterStage", () => {
           $gte: priceRange.min,
           $lte: priceRange.max,
         },
-        [originalProductFieldNames.isHidden]: { $eq: false },
+        [originalProductFieldNames.isHidden]: false,
         [originalProductFieldNames.brandId]: { $in: brandIds },
       },
     });
@@ -250,19 +250,19 @@ describe("makeProductsFilterStage", () => {
 
 describe("makeAggregationPipelineToGetProducts", () => {
   it(`hopefully it creates the long and complex aggregation pipeline`, () => {
-    const categoryId = "oh_hi!";
+    const categoryIds = ["oh_hi!"];
     const brandIds = Object.freeze(["a", "b"]);
     const priceRange = Object.freeze({ min: 1, max: 10 });
     const sortBy = Object.freeze({ price: "descending" });
 
     const pipeline = makeAggregationPipelineToGetProducts({
       sortBy,
-      categoryId,
       priceRange,
       imageUrlPrefix,
       ...validFindArg,
       ...makeFindArgsPartial,
       brandIds: <any>brandIds,
+      categoryIds: categoryIds,
       productCategoriesCollectionName,
     });
 
@@ -272,7 +272,11 @@ describe("makeAggregationPipelineToGetProducts", () => {
     // generator functions, so that, changes to any stage doesn't break
     // this test
     expect(pipeline).toEqual([
-      { $match: { [originalProductFieldNames.categoryId]: "oh_hi!" } },
+      {
+        $match: {
+          [originalProductFieldNames.categoryId]: { $in: categoryIds },
+        },
+      },
       {
         $facet: {
           products: [
@@ -283,7 +287,7 @@ describe("makeAggregationPipelineToGetProducts", () => {
                   $lte: priceRange.max,
                 },
                 [originalProductFieldNames.brandId]: { $in: brandIds },
-                [originalProductFieldNames.isHidden]: { $eq: false },
+                [originalProductFieldNames.isHidden]: false,
               },
             },
             { $sort: { [originalProductFieldNames.price]: -1 } },
