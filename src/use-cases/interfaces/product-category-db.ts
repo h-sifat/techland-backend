@@ -38,5 +38,4 @@ export interface ProductCategoryDatabase {
   ): Promise<Readonly<CategoryInterface> | null>;
   updateById(arg: DBQueryMethodArgs["updateById"]): Promise<void>;
   insert(arg: DBQueryMethodArgs["insert"]): Promise<void>;
-  deleteById(arg: DBQueryMethodArgs["deleteById"]): Promise<void>;
 }
