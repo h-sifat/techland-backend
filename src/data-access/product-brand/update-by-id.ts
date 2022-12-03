@@ -3,10 +3,11 @@ import type {
   ProductBrandDatabase,
 } from "../../use-cases/interfaces/product-brand-db";
 import type { Collection } from "mongodb";
-import { QueryMethodOptions } from "../util";
+import type { QueryMethodOptions } from "../util";
+import type { ProductBrandInterface } from "../../entities/product-brand/interface";
 
 export interface MakeUpdateById_Argument {
-  collection: Pick<Collection, "replaceOne">;
+  collection: Pick<Collection<ProductBrandInterface>, "replaceOne">;
 }
 
 export function makeUpdateById(factoryArg: MakeUpdateById_Argument) {

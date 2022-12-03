@@ -1,5 +1,5 @@
 import type { Collection } from "mongodb";
-import { QueryMethodOptions } from "../util";
+import type { QueryMethodOptions } from "../util";
 import type { ProductBrandInterface } from "../../entities/product-brand/interface";
 import type { ProductBrandDatabase } from "../../use-cases/interfaces/product-brand-db";
 
