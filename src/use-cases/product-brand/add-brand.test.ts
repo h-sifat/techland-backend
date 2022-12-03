@@ -5,14 +5,17 @@ const database = Object.freeze({
   insert: jest.fn(),
   findByName: jest.fn(),
 });
+const getDatabase = jest.fn(() => database);
+
 const dbMethods = Object.freeze(Object.values(database));
 
-const addProductBrand = makeAddProductBrand({ database });
+const addProductBrand = makeAddProductBrand({ getDatabase });
 
 const makeBrandArg = Object.freeze({ name: "Intel" });
 const sampleProductBrand = ProductBrand.make(makeBrandArg);
 
 beforeEach(() => {
+  getDatabase.mockClear();
   dbMethods.forEach((method) => method.mockReset());
 });
 
@@ -42,5 +45,14 @@ describe("Functionality", () => {
 
     expect(database.findByName).toHaveBeenCalledWith({ name: brand.name });
     expect(database.insert).toHaveBeenCalledWith(brand);
+  });
+
+  it(`passes the transaction to the getDatabase function`, async () => {
+    database.findByName.mockResolvedValueOnce(sampleProductBrand);
+
+    const transaction: any = "wicked db transaction";
+    await addProductBrand({ brand: makeBrandArg }, { transaction });
+
+    expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });
 });

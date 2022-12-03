@@ -1,16 +1,18 @@
-import { ProductBrandDatabase } from "../interfaces/product-brand-db";
-import { ProductBrandService } from "../interfaces/product-brand-service";
+import type { GetDatabase } from "../interfaces";
+import type { ProductBrandDatabase } from "../interfaces/product-brand-db";
+import type { ProductBrandService } from "../interfaces/product-brand-service";
 
 export interface Factory_Argument {
-  database: Pick<ProductBrandDatabase, "findAll">;
+  getDatabase: GetDatabase<Pick<ProductBrandDatabase, "findAll">>;
 }
 
 export function makeListProductBrands(
   factoryArg: Factory_Argument
 ): ProductBrandService["listBrands"] {
-  const { database } = factoryArg;
+  const { getDatabase } = factoryArg;
 
-  return async function listProductBrands() {
+  return async function listProductBrands(options = {}) {
+    const database = getDatabase({ transaction: options.transaction });
     return await database.findAll();
   };
 }

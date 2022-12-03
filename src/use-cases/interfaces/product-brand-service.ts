@@ -4,6 +4,7 @@ import type {
 } from "../../entities/product-brand/make-brand-entity";
 import type { DBQueryMethodArgs } from "./product-brand-db";
 import type { ProductBrandInterface } from "../../entities/product-brand/interface";
+import { UseCaseOptions } from ".";
 
 export interface ServiceArguments {
   addBrand: { brand: MakeBrand_Argument };
@@ -15,10 +16,20 @@ export interface ServiceArguments {
 type ProductBrandResponse = Promise<Readonly<ProductBrandInterface>>;
 
 export interface ProductBrandService {
-  addBrand(arg: ServiceArguments["addBrand"]): ProductBrandResponse;
-  editBrand(arg: ServiceArguments["editBrand"]): ProductBrandResponse;
+  addBrand(
+    arg: ServiceArguments["addBrand"],
+    options?: UseCaseOptions
+  ): ProductBrandResponse;
+  editBrand(
+    arg: ServiceArguments["editBrand"],
+    options?: UseCaseOptions
+  ): ProductBrandResponse;
   findBrandById(
-    arg: ServiceArguments["findBrandById"]
+    arg: ServiceArguments["findBrandById"],
+    options?: UseCaseOptions
   ): Promise<Readonly<ProductBrandInterface> | null>;
-  listBrands(): Promise<Readonly<ProductBrandInterface>[]>;
+
+  listBrands(
+    options?: UseCaseOptions
+  ): Promise<Readonly<ProductBrandInterface>[]>;
 }

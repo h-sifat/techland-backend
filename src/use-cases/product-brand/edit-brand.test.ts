@@ -5,12 +5,14 @@ const database = Object.freeze({
   findById: jest.fn(),
   updateById: jest.fn(),
 });
+const getDatabase = jest.fn(() => database);
 const dbMethods = Object.freeze(Object.values(database));
 
-const editProductBrand = makeEditProductBrand({ database });
+const editProductBrand = makeEditProductBrand({ getDatabase });
 const sampleBrand = ProductBrand.make({ name: "Samsung" });
 
 beforeEach(() => {
+  getDatabase.mockClear();
   dbMethods.forEach((method) => method.mockReset());
 });
 
@@ -70,5 +72,16 @@ describe("Functionality", () => {
       ...changes,
       lastModifiedAt: expect.any(Number),
     });
+  });
+
+  it(`passes the transaction to the getDatabase function`, async () => {
+    database.findById.mockResolvedValueOnce(sampleBrand);
+    const id = sampleBrand._id;
+    const changes = Object.freeze({ name: sampleBrand.name + "x" });
+    const transaction: any = "wicked db transaction" + Math.random();
+
+    await editProductBrand({ id, changes }, { transaction });
+
+    expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });
 });
