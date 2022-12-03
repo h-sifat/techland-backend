@@ -1,20 +1,25 @@
+import type {
+  DBQueryMethodArgs,
+  ProductCategoryDatabase,
+} from "../../use-cases/interfaces/product-category-db";
+import type { QueryMethodOptions } from "../util";
 import type { Collection } from "mongodb";
 import type { CategoryInterface } from "../../entities/product-category/interface";
-import type { ProductCategoryDatabase } from "../../use-cases/interfaces/product-category-db";
 
 export interface MakeFindByHash_Argument {
   deepFreeze: <T>(o: T) => T;
-  getCollection(): Pick<Collection<CategoryInterface>, "findOne">;
+  collection: Pick<Collection<CategoryInterface>, "findOne">;
 }
-export function makeFindByHash(
-  factoryArg: MakeFindByHash_Argument
-): ProductCategoryDatabase["findByHash"] {
-  const { deepFreeze, getCollection } = factoryArg;
+export function makeFindByHash(factoryArg: MakeFindByHash_Argument) {
+  const { deepFreeze, collection } = factoryArg;
 
-  return async function findByHash(arg) {
-    const { hash } = arg;
+  return async function findByHash(
+    arg: DBQueryMethodArgs["findByHash"],
+    options: QueryMethodOptions = {}
+  ): ReturnType<ProductCategoryDatabase["findByHash"]> {
+    const findOneArgs: [any, any] = [{ hash: arg.hash }, options];
 
-    const document = await getCollection().findOne({ hash });
+    const document = await collection.findOne(...findOneArgs);
     return deepFreeze(document);
   };
 }

@@ -11,8 +11,8 @@ const imageUrlPrefix = "https://techland.com/imgaes";
 const getSearchSuggestions = makeGetSearchSuggestions({
   deepFreeze,
   imageUrlPrefix,
+  collection: <any>collection,
   makeMainImageUrlGeneratorStage,
-  getCollection: () => <any>collection,
 });
 
 beforeEach(() => {
@@ -21,15 +21,18 @@ beforeEach(() => {
 });
 
 describe("Functionality", () => {
-  it(`calls the aggregate method and returns the result of toArray`, async () => {
-    const fakeSuggestions = [{ v: "a" }, { v: "b" }];
+  const fakeSuggestions = [{ v: "a" }, { v: "b" }];
+
+  const arg = Object.freeze({
+    count: 5,
+    query: "Logitech",
+  });
+
+  beforeEach(() => {
     toArray.mockResolvedValueOnce(fakeSuggestions);
+  });
 
-    const arg = Object.freeze({
-      count: 5,
-      query: "Logitech",
-    });
-
+  it(`calls the aggregate method and returns the result of toArray`, async () => {
     const suggestions = await getSearchSuggestions(arg);
     expect(suggestions).toEqual(fakeSuggestions);
     expect(Object.isFrozen(suggestions)).toBeTruthy();
@@ -44,5 +47,17 @@ describe("Functionality", () => {
     const limitStage = aggregationPipeline.find((stage) => "$limit" in stage);
     expect(limitStage).toBeDefined();
     expect(limitStage).toEqual({ $limit: arg.count });
+
+    expect(aggregate).toHaveBeenCalledTimes(1);
+    expect(aggregate).toHaveBeenCalledWith(expect.any(Array), {});
+  });
+
+  it(`passes the transaction session to the db method`, async () => {
+    const session: any = "my transaction session";
+
+    await getSearchSuggestions(arg, { session });
+
+    expect(aggregate).toHaveBeenCalledTimes(1);
+    expect(aggregate).toHaveBeenCalledWith(expect.any(Array), { session });
   });
 });

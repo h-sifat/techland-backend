@@ -1,14 +1,22 @@
+import type {
+  DBQueryMethodArgs,
+  ProductBrandDatabase,
+} from "../../use-cases/interfaces/product-brand-db";
 import type { Collection } from "mongodb";
-import type { ProductBrandDatabase } from "../../use-cases/interfaces/product-brand-db";
+import { QueryMethodOptions } from "../util";
 
 export interface MakeInsert_Argument {
-  getCollection(): Pick<Collection, "insertOne">;
+  collection: Pick<Collection, "insertOne">;
 }
-export function makeInsert(
-  factoryArg: MakeInsert_Argument
-): ProductBrandDatabase["insert"] {
-  const { getCollection } = factoryArg;
-  return async function insert(document) {
-    await getCollection().insertOne(document as any);
+
+export function makeInsert(factoryArg: MakeInsert_Argument) {
+  const { collection } = factoryArg;
+
+  return async function insert(
+    document: DBQueryMethodArgs["insert"],
+    options: QueryMethodOptions = {}
+  ): ReturnType<ProductBrandDatabase["insert"]> {
+    const insertArgs: [any, any] = [document, options];
+    await collection.insertOne(...insertArgs);
   };
 }

@@ -6,8 +6,8 @@ const collection = Object.freeze({
 });
 
 const findById = makeFindById({
+  collection: <any>collection,
   deepFreeze: deepFreezeStrict,
-  getCollection: () => <any>collection,
 });
 
 beforeEach(() => {
@@ -26,6 +26,18 @@ describe("Functionality", () => {
     expect(Object.isFrozen(result)).toBeTruthy();
 
     expect(collection.findOne).toHaveBeenCalledTimes(1);
-    expect(collection.findOne).toHaveBeenCalledWith({ _id: id });
+    expect(collection.findOne).toHaveBeenCalledWith({ _id: id }, {});
+  });
+
+  it(`passes the transaction session to the db method`, async () => {
+    const id = "a";
+    const fakeResponse = { name: "MSI" };
+    collection.findOne.mockResolvedValueOnce(fakeResponse);
+
+    const session: any = "my transaction session";
+    await findById({ id }, { session });
+
+    expect(collection.findOne).toHaveBeenCalledTimes(1);
+    expect(collection.findOne).toHaveBeenCalledWith({ _id: id }, { session });
   });
 });

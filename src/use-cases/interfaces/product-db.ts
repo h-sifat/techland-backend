@@ -27,6 +27,7 @@ interface SearchProductsArg extends FormatDocumentAs {
 }
 
 export interface DBQueryMethodArgs {
+  insert: ProductPrivateInterface;
   findByIds: {
     ids: string[];
     formatDocumentAs: "public" | "private";
@@ -79,7 +80,7 @@ export type GetSearchSuggestionsResult = (Pick<
 > & { score: number })[];
 
 export interface ProductDatabase {
-  insert(arg: ProductPrivateInterface): Promise<void>;
+  insert(arg: DBQueryMethodArgs["insert"]): Promise<void>;
 
   findByIds<Arg extends DBQueryMethodArgs["findByIds"]>(
     arg: Arg

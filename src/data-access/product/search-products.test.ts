@@ -23,11 +23,11 @@ const searchPaths = Object.freeze([
 const searchProducts = makeSearchProducts({
   deepFreeze,
   imageUrlPrefix,
+  collection: <any>collection,
   productCategoryCollectionName,
   searchPaths: <any>searchPaths,
   makeMainImageUrlGeneratorStage,
   makeAllProductCategoriesLookupStage,
-  getCollection: () => <any>collection,
   makeAggregationStagesForPagination: makePaginationStagesArray,
 });
 
@@ -65,6 +65,9 @@ describe("Functionality", () => {
         },
       },
     });
+
+    expect(aggregate).toHaveBeenCalledTimes(1);
+    expect(aggregate).toHaveBeenCalledWith(expect.any(Array), {});
   });
 
   it(`hides hidden products if formatDocumentAs is "public"`, async () => {
@@ -83,5 +86,16 @@ describe("Functionality", () => {
     expect(aggregationPipeline[1]).not.toEqual({
       $match: { isHidden: false },
     });
+  });
+
+  it(`passes the transaction session to the db method`, async () => {
+    const session: any = "my transaction session";
+    await searchProducts(
+      { ...searchProductsArg, formatDocumentAs: "private" },
+      { session }
+    );
+
+    expect(aggregate).toHaveBeenCalledTimes(1);
+    expect(aggregate).toHaveBeenCalledWith(expect.any(Array), { session });
   });
 });

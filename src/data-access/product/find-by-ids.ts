@@ -1,6 +1,8 @@
 import deepFreezeStrict from "deep-freeze-strict";
+
 import type { Collection } from "mongodb";
-import { ProductDatabase } from "../../use-cases/interfaces/product-db";
+import type { QueryMethodOptions } from "../util";
+import type { DBQueryMethodArgs } from "../../use-cases/interfaces/product-db";
 
 const commonProjectFields = Object.freeze({
   _id: 1,
@@ -31,22 +33,26 @@ export const findByIdsProjectObjects = deepFreezeStrict({
 } as const);
 
 export interface MakeFindByIds_Argument {
-  getCollection(): Pick<Collection, "aggregate">;
+  collection: Pick<Collection, "aggregate">;
 }
-export function makeFindByIds(
-  factoryArg: MakeFindByIds_Argument
-): ProductDatabase["findByIds"] {
-  const { getCollection } = factoryArg;
+export function makeFindByIds(factoryArg: MakeFindByIds_Argument) {
+  const { collection } = factoryArg;
 
-  return async function findByIds(arg) {
+  return async function findByIds(
+    arg: DBQueryMethodArgs["findByIds"],
+    options: QueryMethodOptions = {}
+  ): Promise<any> {
     const { ids, formatDocumentAs } = arg;
 
-    const products = await getCollection()
-      .aggregate([
+    const aggregateArgs: [any, any] = [
+      [
         { $match: { _id: { $in: ids } } },
         { $project: findByIdsProjectObjects[formatDocumentAs] },
-      ])
-      .toArray();
+      ],
+      options,
+    ];
+
+    const products = await collection.aggregate(...aggregateArgs).toArray();
 
     return products as any;
   };

@@ -1,16 +1,22 @@
+import type {
+  DBQueryMethodArgs,
+  ProductDatabase,
+} from "../../use-cases/interfaces/product-db";
 import type { Collection } from "mongodb";
-import type { ProductDatabase } from "../../use-cases/interfaces/product-db";
+import type { QueryMethodOptions } from "../util";
 
 export interface MakeDeleteByIds_Argument {
-  getCollection(): Pick<Collection, "deleteMany">;
+  collection: Pick<Collection, "deleteMany">;
 }
-export function makeDeleteByIds(
-  factoryArg: MakeDeleteByIds_Argument
-): ProductDatabase["deleteByIds"] {
-  const { getCollection } = factoryArg;
+export function makeDeleteByIds(factoryArg: MakeDeleteByIds_Argument) {
+  const { collection } = factoryArg;
 
-  return async function deleteByIds(arg) {
+  return async function deleteByIds(
+    arg: DBQueryMethodArgs["deleteByIds"],
+    options: QueryMethodOptions = {}
+  ): ReturnType<ProductDatabase["deleteByIds"]> {
     const { ids } = arg;
-    await getCollection().deleteMany({ _id: { $in: ids } });
+    const deleteManyArgs: [any, any] = [{ _id: { $in: ids } }, options];
+    await collection.deleteMany(...deleteManyArgs);
   };
 }

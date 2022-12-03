@@ -1,9 +1,10 @@
-import { z } from "zod";
 import {
   isNever,
   MissingOrUnknownPropertiesInSchema,
 } from "../common/util/zod";
+import { z } from "zod";
 import deepFreezeStrict from "deep-freeze-strict";
+import type { ClientSession } from "mongodb";
 
 export interface PaginationObject {
   pageNumber: number;
@@ -47,3 +48,7 @@ export const DocumentFormatSchema = z
     (format) => format === "private" || format === "public",
     (format) => ({ message: `Invalid format: "${format}"` })
   );
+
+export interface QueryMethodOptions {
+  session?: ClientSession;
+}

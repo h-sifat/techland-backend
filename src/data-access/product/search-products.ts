@@ -1,5 +1,6 @@
 import type {
   ProductDatabase,
+  DBQueryMethodArgs,
   MinifiedProductCommonFields,
   MinifiedPublicProductInterface,
   MinifiedPrivateProductInterface,
@@ -8,8 +9,11 @@ import type {
   MakeMainImageUrlGeneratorStage,
   MakeAllProductCategoriesLookupStage,
 } from "./util";
+import type {
+  QueryMethodOptions,
+  MakeAggregationStagesForPagination,
+} from "../util";
 import type { Collection } from "mongodb";
-import type { MakeAggregationStagesForPagination } from "../util";
 import type { ProductPrivateInterface } from "../../entities/product/interface";
 
 export interface MakeSearchProducts_Argument {
@@ -20,17 +24,15 @@ export interface MakeSearchProducts_Argument {
   searchPaths: (keyof ProductPrivateInterface)[];
   makeMainImageUrlGeneratorStage: MakeMainImageUrlGeneratorStage;
   makeAggregationStagesForPagination: MakeAggregationStagesForPagination;
-  getCollection(): Pick<Collection<ProductPrivateInterface>, "aggregate">;
+  collection: Pick<Collection<ProductPrivateInterface>, "aggregate">;
   makeAllProductCategoriesLookupStage: MakeAllProductCategoriesLookupStage;
 }
 
-export function makeSearchProducts(
-  factoryArg: MakeSearchProducts_Argument
-): ProductDatabase["searchProducts"] {
+export function makeSearchProducts(factoryArg: MakeSearchProducts_Argument) {
   const {
     deepFreeze,
     searchPaths,
-    getCollection,
+    collection,
     imageUrlPrefix,
     boostSearchScoreBy = 3,
     productCategoryCollectionName,
@@ -74,7 +76,10 @@ export function makeSearchProducts(
     pickFields: Object.freeze(["_id", "name", "parentId"]) as string[],
   });
 
-  return async function searchProducts(arg) {
+  return async function searchProducts(
+    arg: DBQueryMethodArgs["searchProducts"],
+    options: QueryMethodOptions = {}
+  ): ReturnType<ProductDatabase["searchProducts"]> {
     const { query, pagination, formatDocumentAs } = arg;
 
     // @TODO support specifying categoryId and brand
@@ -128,7 +133,8 @@ export function makeSearchProducts(
       allProductCategoriesLookupStage,
     ];
 
-    const result = await getCollection().aggregate(pipeline).toArray();
+    const aggregateArgs: [any, any] = [pipeline, options];
+    const result = await collection.aggregate(...aggregateArgs).toArray();
     return deepFreeze(result[0]) as any;
   };
 }

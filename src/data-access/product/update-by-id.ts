@@ -1,16 +1,22 @@
+import type {
+  DBQueryMethodArgs,
+  ProductDatabase,
+} from "../../use-cases/interfaces/product-db";
 import type { Collection } from "mongodb";
-import type { ProductDatabase } from "../../use-cases/interfaces/product-db";
+import type { QueryMethodOptions } from "../util";
 
 export interface MakeUpdateById_Argument {
-  getCollection(): Pick<Collection, "replaceOne">;
+  collection: Pick<Collection, "replaceOne">;
 }
-export function makeUpdateById(
-  factoryArg: MakeUpdateById_Argument
-): ProductDatabase["updateById"] {
-  const { getCollection } = factoryArg;
+export function makeUpdateById(factoryArg: MakeUpdateById_Argument) {
+  const { collection } = factoryArg;
 
-  return async function updateById(arg) {
-    const { id, product } = arg;
-    await getCollection().replaceOne({ _id: id }, product);
+  return async function updateById(
+    arg: DBQueryMethodArgs["updateById"],
+    options: QueryMethodOptions = {}
+  ): ReturnType<ProductDatabase["updateById"]> {
+    const { id: _id, product } = arg;
+    const replaceOneArgs: [any, any, any] = [{ _id }, product, options];
+    await collection.replaceOne(...replaceOneArgs);
   };
 }

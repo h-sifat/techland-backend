@@ -38,9 +38,9 @@ const find = makeFindProducts({
   imageUrlPrefix,
   ...makeFindArgsPartial,
   deepFreeze: deepFreezeStrict,
+  collection: collection as any,
   productCategoriesCollectionName,
   makeAggregationPipelineToGetProducts,
-  getCollection: () => collection as any,
 });
 
 const originalProductFieldNames = makeFindArgsPartial.originalProductFieldNames;
@@ -53,49 +53,6 @@ const validFindArg: DBQueryMethodArgs["find"] = deepFreezeStrict({
 beforeEach(() => {
   toArray.mockClear();
   aggregate.mockClear();
-});
-
-describe("find: Argument Validation", () => {
-  const invalidFindArgDataSet: Record<keyof DBQueryMethodArgs["find"], any[]> =
-    deepFreezeStrict({
-      categoryIds: [[""], [12]],
-      sortBy: [{}, { price: 1 }],
-      formatDocumentAs: ["object", ""],
-      brandIds: [[], [""], ["a", 1], "abc"],
-      priceRange: [{ min: -234 }, { max: -234 }, { min: 200, max: 100 }],
-      pagination: [
-        {},
-        { pageNumber: 1 },
-        { itemsPerPage: 1 },
-        { itemsPerPage: -14, pageNumber: 2 },
-        { itemsPerPage: 14, pageNumber: -2 },
-        { itemsPerPage: 14, pageNumber: -2.5 },
-        { itemsPerPage: 14.323, pageNumber: 2 },
-      ],
-    });
-
-  const testSuit = Object.entries(invalidFindArgDataSet)
-    .map(([field, invalidValues]) =>
-      invalidValues.map((value) => ({
-        field,
-        value,
-        case: `"${field}" is invalid (${inspect(value)})`,
-      }))
-    )
-    .flat();
-
-  it.each(testSuit)(`throws error if $case`, async ({ field, value }) => {
-    expect.assertions(2);
-    try {
-      await find({ ...validFindArg, [field]: value });
-    } catch (ex) {
-      expect(ex).toBeInstanceOf(z.ZodError);
-      expect(ex.flatten()).toEqual({
-        formErrors: expect.any(Array),
-        fieldErrors: { [field]: expect.any(Array) },
-      });
-    }
-  });
 });
 
 describe("makeProductsProjectStage", () => {
@@ -358,15 +315,15 @@ describe("makeAggregationPipelineToGetProducts", () => {
 });
 
 describe("find", () => {
-  it(`returns the result`, async () => {
-    const fakeAggregationResult = deepFreezeStrict([
-      {
-        products: ["MSI motherboard"],
-        categories: ["Components"],
-        meta: { count: 100, minPrice: 100, maxPrice: 200, allBrands: ["MSI"] },
-      },
-    ]);
+  const fakeAggregationResult = deepFreezeStrict([
+    {
+      products: ["MSI motherboard"],
+      categories: ["Components"],
+      meta: { count: 100, minPrice: 100, maxPrice: 200, allBrands: ["MSI"] },
+    },
+  ]);
 
+  it(`returns the result`, async () => {
     toArray.mockResolvedValueOnce(fakeAggregationResult);
 
     const result = await find({ ...validFindArg });
@@ -376,5 +333,18 @@ describe("find", () => {
       categories: fakeAggregationResult[0].categories,
       ...fakeAggregationResult[0].meta,
     });
+
+    expect(aggregate).toHaveBeenCalledTimes(1);
+    expect(aggregate).toHaveBeenCalledWith(expect.any(Array), {});
+  });
+
+  it(`passes the transaction session to the db method`, async () => {
+    toArray.mockResolvedValueOnce(fakeAggregationResult);
+
+    const session: any = "my transaction session";
+
+    await find({ ...validFindArg }, { session });
+    expect(aggregate).toHaveBeenCalledTimes(1);
+    expect(aggregate).toHaveBeenCalledWith(expect.any(Array), { session });
   });
 });

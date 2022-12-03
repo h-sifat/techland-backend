@@ -9,6 +9,7 @@ interface FormatDocumentAs {
 }
 
 export interface DBQueryMethodArgs {
+  insert: CategoryInterface;
   findAll: FormatDocumentAs;
   deleteById: { id: string };
   findByHash: { hash: string };
@@ -36,6 +37,6 @@ export interface ProductCategoryDatabase {
     arg: DBQueryMethodArgs["findByHash"]
   ): Promise<Readonly<CategoryInterface> | null>;
   updateById(arg: DBQueryMethodArgs["updateById"]): Promise<void>;
-  insert(arg: CategoryInterface): Promise<void>;
+  insert(arg: DBQueryMethodArgs["insert"]): Promise<void>;
   deleteById(arg: DBQueryMethodArgs["deleteById"]): Promise<void>;
 }

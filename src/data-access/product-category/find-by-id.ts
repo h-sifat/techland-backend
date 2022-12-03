@@ -1,29 +1,33 @@
 import type { Collection } from "mongodb";
+import type { QueryMethodOptions } from "../util";
 import type { CategoryProjectStages } from "./util";
 import type { CategoryInterface } from "../../entities/product-category/interface";
-import type { ProductCategoryDatabase } from "../../use-cases/interfaces/product-category-db";
+import type { DBQueryMethodArgs } from "../../use-cases/interfaces/product-category-db";
 
 export interface MakeFindById_Argument {
   deepFreeze: <T>(o: T) => T;
   categoryProjectStages: CategoryProjectStages;
-  getCollection(): Pick<Collection<CategoryInterface>, "aggregate">;
+  collection: Pick<Collection<CategoryInterface>, "aggregate">;
 }
 
-export function makeFindById(
-  factoryArg: MakeFindById_Argument
-): ProductCategoryDatabase["findById"] {
-  const { deepFreeze, getCollection, categoryProjectStages } = factoryArg;
+export function makeFindById(factoryArg: MakeFindById_Argument) {
+  const { deepFreeze, collection, categoryProjectStages } = factoryArg;
 
-  return async function findById(arg) {
+  return async function findById(
+    arg: DBQueryMethodArgs["findById"],
+    options: QueryMethodOptions = {}
+  ): Promise<any> {
     const { id, formatDocumentAs } = arg;
 
-    const result = await getCollection()
-      .aggregate([
+    const aggregateArgs: [any, any] = [
+      [
         { $match: { _id: id } },
         { $project: categoryProjectStages[formatDocumentAs] },
-      ])
-      .toArray();
+      ],
+      options,
+    ];
 
+    const result = await collection.aggregate(...aggregateArgs).toArray();
     return deepFreeze(result[0]) as any;
   };
 }

@@ -7,7 +7,7 @@ const collection = Object.freeze({ find });
 
 const findAll = makeFindAll({
   deepFreeze: deepFreezeStrict,
-  getCollection: () => <any>collection,
+  collection: <any>collection,
 });
 
 beforeEach(() => {
@@ -25,5 +25,17 @@ describe("Functionality", () => {
     expect(Object.isFrozen(result)).toBeTruthy();
 
     expect(collection.find).toHaveBeenCalledTimes(1);
+    expect(collection.find).toHaveBeenCalledWith({}, {});
+  });
+
+  it(`passes the transaction session to the find method`, async () => {
+    const fakeResponse = [{ _id: 1 }];
+    toArray.mockResolvedValueOnce(fakeResponse);
+
+    const session: any = "my transaction session";
+    await findAll({ session });
+
+    expect(collection.find).toHaveBeenCalledTimes(1);
+    expect(collection.find).toHaveBeenCalledWith({}, { session });
   });
 });

@@ -1,8 +1,10 @@
 import type {
   ProductDatabase,
+  DBQueryMethodArgs,
   SimilarProductsResult,
 } from "../../use-cases/interfaces/product-db";
 import type { Collection } from "mongodb";
+import type { QueryMethodOptions } from "../util";
 import type { MakeMainImageUrlGeneratorStage } from "./util";
 import type { ProductPrivateInterface } from "../../entities/product/interface";
 
@@ -11,15 +13,15 @@ export interface MakeFindSimilarProducts_Argument {
   imageUrlPrefix: string;
   generatedUrlFieldName: string;
   makeMainImageUrlGeneratorStage: MakeMainImageUrlGeneratorStage;
-  getCollection(): Pick<Collection<ProductPrivateInterface>, "aggregate">;
+  collection: Pick<Collection<ProductPrivateInterface>, "aggregate">;
 }
 
 export function makeFindSimilarProducts(
   factoryArg: MakeFindSimilarProducts_Argument
-): ProductDatabase["findSimilarProducts"] {
+) {
   const {
     deepFreeze,
-    getCollection,
+    collection,
     imageUrlPrefix,
     generatedUrlFieldName,
     makeMainImageUrlGeneratorStage,
@@ -35,37 +37,43 @@ export function makeFindSimilarProducts(
     },
   });
 
-  return async function findSimilarProducts(arg) {
+  return async function findSimilarProducts(
+    arg: DBQueryMethodArgs["findSimilarProducts"],
+    options: QueryMethodOptions = {}
+  ): ReturnType<ProductDatabase["findSimilarProducts"]> {
     const { count, product } = arg;
 
-    const similarProducts = await getCollection()
-      .aggregate([
-        {
-          $search: {
-            moreLikeThis: {
-              like: {
-                categoryId: product.categoryId,
-                specifications: product.specifications,
-              },
+    const pipeline = [
+      {
+        $search: {
+          moreLikeThis: {
+            like: {
+              categoryId: product.categoryId,
+              specifications: product.specifications,
             },
           },
         },
-        { $match: { _id: { $ne: product._id }, isHidden: { $eq: false } } },
-        {
-          $project: {
-            _id: 1,
-            name: 1,
-            brand: 1,
-            price: 1,
-            priceUnit: 1,
-            score: { $meta: "searchScore" },
-          },
+      },
+      { $match: { _id: { $ne: product._id }, isHidden: { $eq: false } } },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          brand: 1,
+          price: 1,
+          priceUnit: 1,
+          score: { $meta: "searchScore" },
         },
-        { $sort: { score: -1 } },
-        { $limit: count },
-        mainImageUrlGeneratorStage,
-        { $project: { images: 0 } },
-      ])
+      },
+      { $sort: { score: -1 } },
+      { $limit: count },
+      mainImageUrlGeneratorStage,
+      { $project: { images: 0 } },
+    ];
+
+    const aggregateArgs: [any, any] = [pipeline, options];
+    const similarProducts = await collection
+      .aggregate(...aggregateArgs)
       .toArray();
 
     return deepFreeze(similarProducts) as SimilarProductsResult;

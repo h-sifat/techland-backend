@@ -4,7 +4,7 @@ const collection = Object.freeze({
   replaceOne: jest.fn(),
 });
 
-const updateById = makeUpdateById({ getCollection: () => <any>collection });
+const updateById = makeUpdateById({ collection: <any>collection });
 
 beforeEach(() => {
   Object.values(collection).forEach((method) => method.mockReset());
@@ -17,6 +17,24 @@ describe("Functionality", () => {
 
     await updateById({ id, category });
     expect(collection.replaceOne).toHaveBeenCalledTimes(1);
-    expect(collection.replaceOne).toHaveBeenCalledWith({ _id: id }, category);
+    expect(collection.replaceOne).toHaveBeenCalledWith(
+      { _id: id },
+      category,
+      {}
+    );
+  });
+
+  it(`passes the transaction session to the db method`, async () => {
+    const session: any = "my transaction session";
+
+    const id = "abc";
+    const document = Object.freeze({ name: "Processor" }) as any;
+
+    await updateById({ id, category: document }, { session });
+    expect(collection.replaceOne).toHaveBeenCalledTimes(1);
+
+    expect(collection.replaceOne).toHaveBeenCalledWith({ _id: id }, document, {
+      session,
+    });
   });
 });

@@ -10,9 +10,9 @@ const imageUrlPrefix = "https://techland.com/images";
 const projectStages = makeCategoryProjectStages({ imageUrlPrefix });
 
 const findById = makeFindById({
+  collection: <any>collection,
   deepFreeze: deepFreezeStrict,
   categoryProjectStages: projectStages,
-  getCollection: () => <any>collection,
 });
 
 beforeEach(() => {
@@ -49,7 +49,26 @@ describe("Functionality", () => {
       expect(Object.isFrozen(fakeResponse[0])).toBeTruthy();
 
       expect(aggregate).toHaveBeenCalledTimes(1);
-      expect(aggregate).toHaveBeenCalledWith(expectedAggregationPipeline);
+      expect(aggregate).toHaveBeenCalledWith(expectedAggregationPipeline, {});
     }
   );
+
+  it(`passes the transaction session to the db method`, async () => {
+    const fakeResponse = [{ a: 1 }];
+    toArray.mockResolvedValueOnce(fakeResponse);
+
+    const arg = Object.freeze({ id, formatDocumentAs: "private" });
+    const expectedAggregationPipeline = deepFreezeStrict([
+      { $match: { _id: id } },
+      { $project: projectStages["private"] },
+    ]);
+    const session: any = "my transaction session";
+
+    await findById(arg, { session });
+
+    expect(aggregate).toHaveBeenCalledTimes(1);
+    expect(aggregate).toHaveBeenCalledWith(expectedAggregationPipeline, {
+      session,
+    });
+  });
 });

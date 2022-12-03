@@ -1,6 +1,7 @@
 import type { ProductBrandInterface } from "../../entities/product-brand/interface";
 
 export interface DBQueryMethodArgs {
+  insert: ProductBrandInterface;
   findById: { id: string };
   deleteById: { id: string };
   findByName: { name: string };
@@ -8,7 +9,7 @@ export interface DBQueryMethodArgs {
 }
 
 export interface ProductBrandDatabase {
-  insert(brand: ProductBrandInterface): Promise<void>;
+  insert(arg: DBQueryMethodArgs["insert"]): Promise<void>;
   findAll(): Promise<Readonly<ProductBrandInterface>[]>;
   findById(
     arg: DBQueryMethodArgs["findById"]

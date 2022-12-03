@@ -1,11 +1,7 @@
-import {
-  PaginationSchema,
-  DocumentFormatSchema,
+import type {
+  QueryMethodOptions,
   MakeAggregationStagesForPagination,
 } from "../util";
-import { z } from "zod";
-import { isNever, makeZodErrorMap } from "../../common/util/zod";
-
 import type {
   MakeMainImageUrlGeneratorStage,
   MakeAllProductCategoriesLookupStage,
@@ -13,58 +9,12 @@ import type {
 import type { Collection } from "mongodb";
 import type { ProductDatabase } from "../../use-cases/interfaces/product-db";
 import type { DBQueryMethodArgs } from "../../use-cases/interfaces/product-db";
-import type { MissingOrUnknownPropertiesInSchema } from "../../common/util/zod";
 import type { ProductPrivateInterface } from "../../entities/product/interface";
-
-// =====================[Validation Schema]=======================
-
-// @TODO move this validation logic to the controller-layer
-export const FindProductArgumentSchema = z
-  .object({
-    brandIds: z.array(z.string().min(1)).min(1).optional(),
-    categoryIds: z.array(z.string().min(1)).default([]),
-
-    priceRange: z
-      .object({
-        min: z.number().positive().optional(),
-        max: z.number().positive().optional(),
-      })
-      .strict()
-      .refine(({ min = -Infinity, max = Infinity }) => min <= max, {
-        message: `Price Range: "min" must be less than "max".`,
-      })
-      .optional(),
-
-    sortBy: z
-      .object({
-        price: z.string().refine(
-          (order) => order === "ascending" || order === "descending",
-          (order) => ({ message: `Invalid sort order: "${order}"` })
-        ),
-      })
-      .strict()
-      .default({ price: "ascending" }),
-
-    pagination: PaginationSchema,
-    formatDocumentAs: DocumentFormatSchema,
-  })
-  .strict();
-
-{
-  type shouldBeNever = MissingOrUnknownPropertiesInSchema<
-    z.infer<typeof FindProductArgumentSchema>,
-    DBQueryMethodArgs["find"]
-  >;
-  isNever<shouldBeNever>();
-}
-
-const errorMap = makeZodErrorMap({ objectName: "findProductsArgument" });
-// ===============[End of Validation Schema]==================
 
 // @TODO: fix poor variable naming
 export interface MakeFind_Argument {
   deepFreeze<T>(o: T): T;
-  getCollection(): Pick<Collection<ProductPrivateInterface>, "aggregate">;
+  collection: Pick<Collection<ProductPrivateInterface>, "aggregate">;
 
   imageUrlPrefix: string;
   metaFieldNames: {
@@ -98,12 +48,10 @@ export interface MakeFind_Argument {
     arg: MakeAggregationPipeline_Argument
   ): object[];
 }
-export function makeFindProducts(
-  factoryArg: MakeFind_Argument
-): ProductDatabase["find"] {
+export function makeFindProducts(factoryArg: MakeFind_Argument) {
   const {
     deepFreeze,
-    getCollection,
+    collection,
 
     metaFieldName,
     imageUrlPrefix,
@@ -119,11 +67,10 @@ export function makeFindProducts(
     makeAggregationPipelineToGetProducts,
   } = factoryArg;
 
-  return async function find(unValidatedArg) {
-    const findArg = FindProductArgumentSchema.parse(unValidatedArg, {
-      errorMap,
-    }) as DBQueryMethodArgs["find"];
-
+  return async function find(
+    findArg: DBQueryMethodArgs["find"],
+    options: QueryMethodOptions = {}
+  ): ReturnType<ProductDatabase["find"]> {
     const aggregationPipeline = makeAggregationPipelineToGetProducts({
       ...findArg,
       metaFieldName,
@@ -137,9 +84,8 @@ export function makeFindProducts(
       productCategoriesCollectionName,
     });
 
-    const resultArray = await getCollection()
-      .aggregate(aggregationPipeline)
-      .toArray();
+    const aggregateArgs: [any, any] = [aggregationPipeline, options];
+    const resultArray = await collection.aggregate(...aggregateArgs).toArray();
 
     /**
      * Example structure, but the field names may be different.
