@@ -2,9 +2,9 @@ import {
   makeAllProductCategoriesLookupStage,
   makeMainImageUrlGeneratorStage,
 } from "./util";
-import deepFreeze from "deep-freeze-strict";
 import { makePaginationStagesArray } from "../util";
 import { makeSearchProducts } from "./search-products";
+import { deepFreeze } from "../../common/util/deep-freeze";
 
 const toArray = jest.fn();
 const aggregate = jest.fn(() => Object.freeze({ toArray }));

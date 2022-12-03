@@ -6,12 +6,12 @@ import { makeUpdateById } from "./update-by-id";
 import { Collection } from "mongodb";
 import { CategoryInterface } from "../../entities/product-category/interface";
 
-import deepFreeze from "deep-freeze-strict";
 import { makeCategoryProjectStages } from "./util";
 import { addUseTransactionAndArgsFilter } from "../util";
 
 import type { MakeDatabaseType } from "../interface";
 import type { ProductCategoryDatabase } from "../../use-cases/interfaces/product-category-db";
+import { deepFreeze } from "../../common/util/deep-freeze";
 
 export interface MakeProductCategoryDatabase_Argument {
   collection: Collection<CategoryInterface>;

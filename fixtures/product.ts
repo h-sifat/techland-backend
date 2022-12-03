@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import deepFreeze from "deep-freeze-strict";
+import { deepFreeze } from "../src/common/util/deep-freeze";
 import type { ProductPrivateInterface } from "../src/entities/product/interface";
 import type { MakeProduct_Argument } from "../src/entities/product/make-product-entity";
 

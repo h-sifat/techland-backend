@@ -7,13 +7,13 @@ import {
 } from "./find";
 
 import { makeFindArgsPartial } from ".";
-import deepFreezeStrict from "deep-freeze-strict";
 import { makePaginationStagesArray } from "../util";
 import { DBQueryMethodArgs } from "../../use-cases/interfaces/product-db";
 import {
   makeMainImageUrlGeneratorStage,
   makeAllProductCategoriesLookupStage,
 } from "./util";
+import { deepFreeze } from "../../common/util/deep-freeze";
 
 const toArray = jest.fn();
 const aggregate = jest.fn(() => Object.freeze({ toArray }));
@@ -35,7 +35,7 @@ const makeAggregationPipelineToGetProducts =
 const find = makeFind({
   imageUrlPrefix,
   ...makeFindArgsPartial,
-  deepFreeze: deepFreezeStrict,
+  deepFreeze: deepFreeze,
   collection: collection as any,
   productCategoriesCollectionName,
   makeAggregationPipelineToGetProducts,
@@ -43,7 +43,7 @@ const find = makeFind({
 
 const originalProductFieldNames = makeFindArgsPartial.originalProductFieldNames;
 
-const validFindArg: DBQueryMethodArgs["find"] = deepFreezeStrict({
+const validFindArg: DBQueryMethodArgs["find"] = deepFreeze({
   formatDocumentAs: "public",
   pagination: { pageNumber: 1, itemsPerPage: 20 },
 });
@@ -61,7 +61,7 @@ describe("makeProductsProjectStage", () => {
         public: Object.freeze(["a", "b"]),
         private: Object.freeze(["c", "d"]),
       },
-      expectedResult: deepFreezeStrict({ $project: { a: 1, b: 1 } }),
+      expectedResult: deepFreeze({ $project: { a: 1, b: 1 } }),
     },
     {
       formatDocumentAs: "private",
@@ -69,7 +69,7 @@ describe("makeProductsProjectStage", () => {
         public: Object.freeze(["a", "b"]),
         private: Object.freeze(["c", "d"]),
       },
-      expectedResult: deepFreezeStrict({ $project: { c: 1, d: 1 } }),
+      expectedResult: deepFreeze({ $project: { c: 1, d: 1 } }),
     },
   ] as const)(
     `generates the right project object for "$formatDocumentAs" type`,
@@ -89,11 +89,11 @@ describe("makeProductsSortStage", () => {
   it.each([
     {
       sortBy: undefined,
-      expectedResult: deepFreezeStrict({ $sort: { _id: 1 } }),
+      expectedResult: deepFreeze({ $sort: { _id: 1 } }),
     },
     {
       sortBy: { price: "ascending", createdAt: "descending" },
-      expectedResult: deepFreezeStrict({ $sort: { price: 1, createdAt: -1 } }),
+      expectedResult: deepFreeze({ $sort: { price: 1, createdAt: -1 } }),
     },
   ])(
     `returns $expectedResult if sortBy is: $sortBy`,
@@ -109,50 +109,50 @@ describe("makeProductsFilterStage", () => {
   it.each([
     {
       arg: { originalProductFieldNames },
-      expectedResult: deepFreezeStrict({ $match: {} }),
+      expectedResult: deepFreeze({ $match: {} }),
       case: `with not filters if no filter prop exists`,
     },
     {
       arg: { originalProductFieldNames, priceRange: { min: 10 } },
-      expectedResult: deepFreezeStrict({
+      expectedResult: deepFreeze({
         $match: { [originalProductFieldNames.price]: { $gte: 10 } },
       }),
       case: `with min price filter if "min" exists in "priceRange"`,
     },
     {
       arg: { originalProductFieldNames, priceRange: { max: 10 } },
-      expectedResult: deepFreezeStrict({
+      expectedResult: deepFreeze({
         $match: { [originalProductFieldNames.price]: { $lte: 10 } },
       }),
       case: `with max price filter if "max" exists in "priceRange"`,
     },
     {
       arg: { originalProductFieldNames, priceRange: { min: 1, max: 10 } },
-      expectedResult: deepFreezeStrict({
+      expectedResult: deepFreeze({
         $match: { [originalProductFieldNames.price]: { $gte: 1, $lte: 10 } },
       }),
       case: `with both price filter "min" and "max if they exists"`,
     },
     {
       arg: { originalProductFieldNames, priceRange: { max: undefined } },
-      expectedResult: deepFreezeStrict({ $match: {} }),
+      expectedResult: deepFreeze({ $match: {} }),
       case: `with no price filter if "min" and "max does not exists"`,
     },
     {
       arg: { originalProductFieldNames, formatDocumentAs: "public" },
-      expectedResult: deepFreezeStrict({
+      expectedResult: deepFreeze({
         $match: { [originalProductFieldNames.isHidden]: false },
       }),
       case: `with ${originalProductFieldNames.isHidden} !== false if "formatDocumentAs" is public`,
     },
     {
       arg: { originalProductFieldNames, brandIds: [] },
-      expectedResult: deepFreezeStrict({ $match: {} }),
+      expectedResult: deepFreeze({ $match: {} }),
       case: `with no brand filter if brandIds is an empty array`,
     },
     {
       arg: { originalProductFieldNames, brandIds: ["a"] },
-      expectedResult: deepFreezeStrict({
+      expectedResult: deepFreeze({
         $match: { [originalProductFieldNames.brandId]: { $in: ["a"] } },
       }),
       case: `with brand filter if brandIds is a non empty array`,
@@ -313,7 +313,7 @@ describe("makeAggregationPipelineToGetProducts", () => {
 });
 
 describe("find", () => {
-  const fakeAggregationResult = deepFreezeStrict([
+  const fakeAggregationResult = deepFreeze([
     {
       products: ["MSI motherboard"],
       categories: ["Components"],

@@ -1,4 +1,4 @@
-import deepFreeze from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeGetSearchSuggestions } from "./get-search-suggestions";
 import { makeMainImageUrlGeneratorStage } from "./util";
 

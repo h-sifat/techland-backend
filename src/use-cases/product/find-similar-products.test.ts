@@ -1,4 +1,4 @@
-import deepFreezeStrict from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeFindSimilarProducts } from "./find-similar-products";
 
 const database = Object.freeze({
@@ -42,7 +42,7 @@ describe("Functionality", () => {
     });
     database.findByIds.mockResolvedValueOnce([fakeProduct]);
 
-    const fakeSimilarProducts = deepFreezeStrict([{ a: 1 }, { b: 2 }]);
+    const fakeSimilarProducts = deepFreeze([{ a: 1 }, { b: 2 }]);
     database.findSimilarProducts.mockResolvedValueOnce(fakeSimilarProducts);
 
     const similarProducts = await findSimilarProducts(arg);

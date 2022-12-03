@@ -1,4 +1,4 @@
-import deepFreezeStrict from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeFindByHash } from "./find-by-hash";
 
 const collection = Object.freeze({
@@ -6,7 +6,7 @@ const collection = Object.freeze({
 });
 
 const findByHash = makeFindByHash({
-  deepFreeze: deepFreezeStrict,
+  deepFreeze: deepFreeze,
   collection: <any>collection,
 });
 

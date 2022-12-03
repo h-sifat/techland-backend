@@ -17,7 +17,6 @@
   "license": "MIT",
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
-    "@types/deep-freeze-strict": "^1.1.0",
     "@types/jest": "^29.2.3",
     "@types/lodash": "^4.14.189",
     "@types/node": "^18.11.9",
@@ -27,7 +26,6 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cuid": "^2.1.8",
-    "deep-freeze-strict": "^1.1.1",
     "isomorphic-dompurify": "^0.24.0",
     "lodash": "^4.17.21",
     "mongodb": "^4.12.1",

@@ -1,4 +1,4 @@
-import deepFreezeStrict from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeFindAll } from "./find-all";
 import { makeCategoryProjectStages } from "./util";
 
@@ -11,7 +11,7 @@ const projectStages = makeCategoryProjectStages({ imageUrlPrefix });
 
 const findAll = makeFindAll({
   collection: <any>collection,
-  deepFreeze: deepFreezeStrict,
+  deepFreeze: deepFreeze,
   categoryProjectStages: projectStages,
 });
 

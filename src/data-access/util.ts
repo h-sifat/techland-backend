@@ -3,7 +3,6 @@ import {
   MissingOrUnknownPropertiesInSchema,
 } from "../common/util/zod";
 import { z } from "zod";
-import deepFreezeStrict from "deep-freeze-strict";
 
 import type {
   WithTransaction,
@@ -12,6 +11,7 @@ import type {
   MakeDatabaseType,
 } from "./interface";
 import type { ClientSession } from "mongodb";
+import { deepFreeze } from "../common/util/deep-freeze";
 
 export interface PaginationObject {
   pageNumber: number;
@@ -105,7 +105,7 @@ export function makePaginationStagesArray(
 ): [{ $skip: number }, { $limit: number }] {
   const { pageNumber, itemsPerPage } = arg;
 
-  return deepFreezeStrict([
+  return deepFreeze([
     { $skip: (pageNumber - 1) * itemsPerPage },
     { $limit: itemsPerPage },
   ]);

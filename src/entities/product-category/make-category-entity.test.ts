@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { CategoryInterface } from "./interface";
-import deepFreezeStrict from "deep-freeze-strict";
 import { makeProductCategoryEntity } from "./make-category-entity";
 import { createMD5Hash, currentTimeMs, makeId } from "../../common/util";
+import { deepFreeze } from "../../common/util/deep-freeze";
 
 const Category = makeProductCategoryEntity({
   makeId,
@@ -16,7 +16,7 @@ const validMakeCategoryArg = Object.freeze({
   description: "Core components like CUPs, MOBOs",
 });
 
-const invalidData: Record<keyof CategoryInterface, any[]> = deepFreezeStrict({
+const invalidData: Record<keyof CategoryInterface, any[]> = deepFreeze({
   hash: [""],
   _id: ["", 321],
   parentId: ["", 234],

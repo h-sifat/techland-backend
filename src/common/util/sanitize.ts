@@ -1,5 +1,5 @@
-import deepFreeze from "deep-freeze-strict";
 import DOMPurify from "isomorphic-dompurify";
+import { deepFreeze } from "./deep-freeze";
 
 // configuring dompurify to allow `iframe` tags
 DOMPurify.addHook("uponSanitizeElement", (node: any, data) => {

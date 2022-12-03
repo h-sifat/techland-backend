@@ -1,4 +1,4 @@
-import deepFreezeStrict from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeListProductBrands } from "./list-brands";
 
 const database = Object.freeze({
@@ -14,7 +14,7 @@ beforeEach(() => {
 
 describe("Functionality", () => {
   it(`returns all the results from the database.findAll method`, async () => {
-    const mockBrands = deepFreezeStrict([{ a: 1 }, { b: 1 }]);
+    const mockBrands = deepFreeze([{ a: 1 }, { b: 1 }]);
     database.findAll.mockResolvedValueOnce(mockBrands);
 
     const productBrands = await listProductBrands();

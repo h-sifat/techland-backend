@@ -1,4 +1,4 @@
-import deepFreezeStrict from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeFindById } from "./find-by-id";
 
 const collection = Object.freeze({
@@ -7,7 +7,7 @@ const collection = Object.freeze({
 
 const findById = makeFindById({
   collection: <any>collection,
-  deepFreeze: deepFreezeStrict,
+  deepFreeze: deepFreeze,
 });
 
 beforeEach(() => {

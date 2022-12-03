@@ -1,5 +1,5 @@
-import deepFreezeStrict from "deep-freeze-strict";
 import { makeListProductCategories } from "./list-categories";
+import { deepFreeze } from "../../common/util/deep-freeze";
 
 const database = Object.freeze({
   findAll: jest.fn(),
@@ -14,7 +14,7 @@ beforeEach(() => {
 
 describe("Functionality", () => {
   it(`returns all the results from the database.findAll method`, async () => {
-    const mockCategories = deepFreezeStrict([{ a: 1 }, { b: 1 }]);
+    const mockCategories = deepFreeze([{ a: 1 }, { b: 1 }]);
     database.findAll.mockResolvedValueOnce(mockCategories);
 
     const arg = Object.freeze({ formatDocumentAs: "private" });

@@ -1,8 +1,7 @@
-import deepFreezeStrict from "deep-freeze-strict";
-
 import type { Collection } from "mongodb";
 import type { QueryMethodOptions } from "../util";
 import type { DBQueryMethodArgs } from "../../use-cases/interfaces/product-db";
+import { deepFreeze } from "../../common/util/deep-freeze";
 
 const commonProjectFields = Object.freeze({
   _id: 1,
@@ -19,7 +18,7 @@ const commonProjectFields = Object.freeze({
   shortDescriptions: 1,
 } as const);
 
-export const findByIdsProjectObjects = deepFreezeStrict({
+export const findByIdsProjectObjects = deepFreeze({
   public: {
     ...commonProjectFields,
     inStock: { $ne: ["$inStock", 0] },

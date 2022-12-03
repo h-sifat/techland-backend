@@ -6,8 +6,8 @@ import {
 import { z } from "zod";
 import { inspect } from "util";
 import { PRICE_UNITS } from "./interface";
-import deepFreeze from "deep-freeze-strict";
 import { currentTimeMs, makeId } from "../../common/util";
+import { deepFreeze } from "../../common/util/deep-freeze";
 
 const sanitizeHTML = jest.fn((str) => str);
 const Product = makeProductEntity({

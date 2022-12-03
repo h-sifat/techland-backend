@@ -1,9 +1,8 @@
+import { deepFreeze } from "../../common/util/deep-freeze";
 import type {
   CategoryPublicInterface,
   CategoryPrivateInterface,
 } from "../../entities/product-category/interface";
-
-import deepFreeze from "deep-freeze-strict";
 
 export interface CategoryProjectStages {
   public: Record<keyof CategoryPublicInterface, number | object>;

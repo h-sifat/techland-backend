@@ -1,4 +1,4 @@
-import deepFreezeStrict from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeListProducts } from "./list-products";
 
 const database = Object.freeze({
@@ -14,7 +14,7 @@ beforeEach(() => {
 
 describe("Functionality", () => {
   it(`passes the arguments to the database.find method and returns the response`, async () => {
-    const arg = deepFreezeStrict({
+    const arg = deepFreeze({
       formatDocumentAs: "private",
       pagination: { pageNumber: 1, itemsPerPage: 20 },
     } as const);

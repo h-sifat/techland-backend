@@ -1,5 +1,5 @@
-import deepFreeze from "deep-freeze-strict";
 import { makeId } from "../../common/util";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeFindSimilarProducts } from "./find-similar-products";
 import { makeMainImageUrlGeneratorStage } from "./util";
 

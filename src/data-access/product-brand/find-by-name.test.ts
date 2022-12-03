@@ -1,4 +1,4 @@
-import deepFreeze from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeFindByName } from "./find-by-name";
 
 const collection = Object.freeze({

@@ -1,4 +1,4 @@
-import deepFreezeStrict from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeFindById } from "./find-by-id";
 import { makeCategoryProjectStages } from "./util";
 
@@ -11,7 +11,7 @@ const projectStages = makeCategoryProjectStages({ imageUrlPrefix });
 
 const findById = makeFindById({
   collection: <any>collection,
-  deepFreeze: deepFreezeStrict,
+  deepFreeze: deepFreeze,
   categoryProjectStages: projectStages,
 });
 
@@ -58,7 +58,7 @@ describe("Functionality", () => {
     toArray.mockResolvedValueOnce(fakeResponse);
 
     const arg = Object.freeze({ id, formatDocumentAs: "private" });
-    const expectedAggregationPipeline = deepFreezeStrict([
+    const expectedAggregationPipeline = deepFreeze([
       { $match: { _id: id } },
       { $project: projectStages["private"] },
     ]);

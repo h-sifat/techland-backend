@@ -1,11 +1,11 @@
-import deepFreezeStrict from "deep-freeze-strict";
 import { z } from "zod";
 import { currentTimeMs, makeId } from "../../common/util";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { makeProductBrandEntity } from "./make-brand-entity";
 
 const ProductBrand = makeProductBrandEntity({ makeId, currentTimeMs });
 
-const invalidData = deepFreezeStrict({
+const invalidData = deepFreeze({
   _id: ["", "   ", 234],
   name: ["", "   ", 234],
   createdAt: [12.23423, -234, "2022-07-11"],

@@ -1,5 +1,3 @@
-import deepFreeze from "deep-freeze-strict";
-
 import {
   makeFind,
   makeProductsSortStage,
@@ -28,6 +26,7 @@ import type { Collection } from "mongodb";
 import type { MakeDatabaseType } from "../interface";
 import type { ProductDatabase } from "../../use-cases/interfaces/product-db";
 import type { ProductPrivateInterface } from "../../entities/product/interface";
+import { deepFreeze } from "../../common/util/deep-freeze";
 
 export const makeFindArgsPartial = (() => {
   const commonFormattedProductFields = [

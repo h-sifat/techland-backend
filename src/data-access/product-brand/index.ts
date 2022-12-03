@@ -4,7 +4,7 @@ import { makeFindById } from "./find-by-id";
 import { makeFindByName } from "./find-by-name";
 import { makeUpdateById } from "./update-by-id";
 
-import deepFreeze from "deep-freeze-strict";
+import { deepFreeze } from "../../common/util/deep-freeze";
 import { addUseTransactionAndArgsFilter } from "../util";
 
 import type { Collection } from "mongodb";
