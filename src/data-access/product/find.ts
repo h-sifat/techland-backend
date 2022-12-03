@@ -48,7 +48,7 @@ export interface MakeFind_Argument {
     arg: MakeAggregationPipeline_Argument
   ): object[];
 }
-export function makeFindProducts(factoryArg: MakeFind_Argument) {
+export function makeFind(factoryArg: MakeFind_Argument) {
   const {
     deepFreeze,
     collection,

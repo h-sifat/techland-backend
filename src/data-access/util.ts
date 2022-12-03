@@ -4,11 +4,81 @@ import {
 } from "../common/util/zod";
 import { z } from "zod";
 import deepFreezeStrict from "deep-freeze-strict";
+
+import type {
+  WithTransaction,
+  MakeWithTransaction_Argument,
+  CustomTransaction,
+  MakeDatabaseType,
+} from "./interface";
 import type { ClientSession } from "mongodb";
 
 export interface PaginationObject {
   pageNumber: number;
   itemsPerPage: number;
+}
+
+export function makeWithTransaction(
+  factoryArg: MakeWithTransaction_Argument
+): WithTransaction {
+  const { client, transactionOptions } = factoryArg;
+
+  return async function withTransaction(callback) {
+    const session = client.startSession();
+
+    try {
+      await session.withTransaction(async () => {
+        const transaction = Object.freeze({
+          transaction: Object.freeze({ session }),
+        });
+
+        await callback(transaction);
+      }, transactionOptions);
+    } finally {
+      await session.endSession();
+    }
+  };
+}
+
+export interface MakeTransactionalDatabaseProxy_Argument<Database> {
+  database: Database;
+  transaction: CustomTransaction;
+}
+
+export function makeTransactionalDatabaseProxy<DB extends object>(
+  factoryArg: MakeTransactionalDatabaseProxy_Argument<DB>
+): DB {
+  const { database, transaction } = factoryArg;
+
+  return new Proxy(database, {
+    get(target, property, receiver) {
+      if (typeof (<any>target)[property] === "function") {
+        return (arg: any) =>
+          // Here we're are injecting the transaction session
+          (<any>target)[property](arg, { session: transaction.session });
+      }
+      return Reflect.get(target, property, receiver);
+    },
+  });
+}
+
+export function addUseTransactionAndArgsFilter<DB extends object>(
+  db: DB
+): MakeDatabaseType<DB> {
+  const database: any = {
+    useTransaction(transaction: any) {
+      return makeTransactionalDatabaseProxy({
+        transaction,
+        database: db,
+      });
+    },
+  };
+
+  Object.entries(db).forEach(([name, func]) => {
+    (<any>database)[name] = (arg: any) => (<Function>func)(arg);
+  });
+
+  return Object.freeze(database) as any;
 }
 
 export const PaginationSchema = z

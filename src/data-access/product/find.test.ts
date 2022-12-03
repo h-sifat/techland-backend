@@ -1,13 +1,11 @@
 import {
-  makeFindProducts,
+  makeFind,
   makeProductsSortStage,
   makeProductsFilterStage,
   makeProductsProjectStage,
   buildMakeAggregationPipelineToGetProducts,
 } from "./find";
 
-import { z } from "zod";
-import { inspect } from "util";
 import { makeFindArgsPartial } from ".";
 import deepFreezeStrict from "deep-freeze-strict";
 import { makePaginationStagesArray } from "../util";
@@ -34,7 +32,7 @@ const makeAggregationPipelineToGetProducts =
     makeProductsPaginationStagesArray: makePaginationStagesArray,
   });
 
-const find = makeFindProducts({
+const find = makeFind({
   imageUrlPrefix,
   ...makeFindArgsPartial,
   deepFreeze: deepFreezeStrict,
