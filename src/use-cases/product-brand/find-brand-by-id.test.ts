@@ -1,4 +1,4 @@
-import { makeFindBrandById } from "./find-brand";
+import { makeFindBrandById } from "./find-brand-by-id";
 
 const database = Object.freeze({
   findById: jest.fn(),
