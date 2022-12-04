@@ -1,16 +1,18 @@
+import { GetDatabase } from "../interfaces";
 import type { ProductCategoryDatabase } from "../interfaces/product-category-db";
 import type { ProductCategoryService } from "../interfaces/product-category-service";
 
 export interface MakeListProductCategories_Argument {
-  database: Pick<ProductCategoryDatabase, "findAll">;
+  getDatabase: GetDatabase<Pick<ProductCategoryDatabase, "findAll">>;
 }
 
 export function makeListProductCategories(
   factoryArg: MakeListProductCategories_Argument
 ): ProductCategoryService["listCategories"] {
-  const { database } = factoryArg;
+  const { getDatabase } = factoryArg;
 
-  return async function listProductCategories(options) {
-    return await database.findAll(options);
+  return async function listProductCategories(arg, options = {}) {
+    const database = getDatabase({ transaction: options.transaction });
+    return await database.findAll(arg);
   };
 }

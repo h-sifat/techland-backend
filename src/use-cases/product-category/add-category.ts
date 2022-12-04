@@ -1,17 +1,22 @@
 import { ProductCategory } from "../../entities/product-category";
+import type { GetDatabase } from "../interfaces";
 
 import type { ProductCategoryDatabase } from "../interfaces/product-category-db";
 import type { ProductCategoryService } from "../interfaces/product-category-service";
 
 interface FactoryArgument {
-  database: Pick<ProductCategoryDatabase, "findByHash" | "insert">;
+  getDatabase: GetDatabase<
+    Pick<ProductCategoryDatabase, "findByHash" | "insert">
+  >;
 }
 
 export function makeAddProductCategory(
   factoryArg: FactoryArgument
 ): ProductCategoryService["addCategory"] {
-  const { database } = factoryArg;
-  return async function addProductCategory(arg) {
+  const { getDatabase } = factoryArg;
+  return async function addProductCategory(arg, options = {}) {
+    const database = getDatabase({ transaction: options.transaction });
+
     const category = ProductCategory.make(arg.category);
 
     {

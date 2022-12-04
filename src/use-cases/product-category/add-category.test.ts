@@ -6,9 +6,10 @@ const database = Object.freeze({
   insert: jest.fn(),
   findByHash: jest.fn(),
 });
+const getDatabase = jest.fn(() => database);
 const dbMethods = Object.freeze(Object.values(database));
 
-const addProductCategory = makeAddProductCategory({ database });
+const addProductCategory = makeAddProductCategory({ getDatabase });
 
 const makeCategoryArg = Object.freeze({
   name: "Components",
@@ -17,6 +18,7 @@ const makeCategoryArg = Object.freeze({
 const sampleProductCategory = ProductCategory.make(makeCategoryArg);
 
 beforeEach(() => {
+  getDatabase.mockClear();
   dbMethods.forEach((method) => method.mockReset());
 });
 
@@ -46,5 +48,14 @@ describe("Functionality", () => {
 
     expect(database.findByHash).toHaveBeenCalledWith({ hash: category.hash });
     expect(database.insert).toHaveBeenCalledWith(category);
+  });
+
+  it(`passes the transaction to the getDatabase function`, async () => {
+    database.findByHash.mockResolvedValueOnce(sampleProductCategory);
+
+    const transaction: any = "wicked db transaction" + Math.random();
+    await addProductCategory({ category: makeCategoryArg }, { transaction });
+
+    expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });
 });

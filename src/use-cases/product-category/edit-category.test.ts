@@ -6,12 +6,14 @@ const database = Object.freeze({
   updateById: jest.fn(),
 });
 const dbMethods = Object.freeze(Object.values(database));
+const getDatabase = jest.fn(() => database);
 
-const editProductCategory = makeEditProductCategory({ database });
+const editProductCategory = makeEditProductCategory({ getDatabase });
 const sampleCategory = ProductCategory.make({ name: "Accessories" });
 const formatDocumentAs = "private";
 
 beforeEach(() => {
+  getDatabase.mockClear();
   dbMethods.forEach((method) => method.mockReset());
 });
 
@@ -71,5 +73,16 @@ describe("Functionality", () => {
       hash: expect.any(String),
     });
     expect(sampleCategory.hash).not.toBe(edited.hash);
+  });
+
+  it(`passes the transaction to the getDatabase function`, async () => {
+    const transaction: any = "wicked db transaction" + Math.random();
+
+    database.findById.mockResolvedValueOnce(sampleCategory);
+    const id = sampleCategory._id;
+    const changes = Object.freeze({ name: "ABC" });
+
+    await editProductCategory({ id, changes }, { transaction });
+    expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });
 });

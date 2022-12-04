@@ -1,3 +1,4 @@
+import { UseCaseOptions } from ".";
 import type {
   CategoryInterface,
   CategoryPublicInterface,
@@ -28,10 +29,14 @@ export type FormatDocument<Arg extends FormatDocumentAs> =
 
 export interface ProductCategoryDatabase {
   findAll<Arg extends DBQueryMethodArgs["findAll"]>(
-    arg: Arg
+    arg: Arg,
+    // @TODO remove the use-case options. it doesn't belong here
+    options?: UseCaseOptions
   ): Promise<Readonly<FormatDocument<Arg>>[]>;
   findById<Arg extends DBQueryMethodArgs["findById"]>(
-    arg: Arg
+    arg: Arg,
+    // @TODO remove the use-case options. it doesn't belong here
+    options?: UseCaseOptions
   ): Promise<Readonly<FormatDocument<Arg>> | null>;
   findByHash(
     arg: DBQueryMethodArgs["findByHash"]
