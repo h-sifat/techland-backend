@@ -28,11 +28,11 @@ export function makeWithTransaction(
 
     try {
       await session.withTransaction(async () => {
-        const transaction = Object.freeze({
+        const callbackArg = Object.freeze({
           transaction: Object.freeze({ session }),
         });
 
-        await callback(transaction);
+        await callback(callbackArg);
       }, transactionOptions);
     } finally {
       await session.endSession();

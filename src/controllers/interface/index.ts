@@ -5,9 +5,9 @@ export interface HttpRequest {
   ip: string;
   path: string;
   method: RequestMethod;
-  query: Record<string, string>;
-  params: Record<string, string>;
-  headers: Record<string, string | undefined>;
+  query: Record<string, any>;
+  params: Record<string, any>;
+  headers: Record<string, any>;
 }
 
 export type HttpResponseError =
@@ -26,3 +26,8 @@ export interface HttpResponse {
   statusCode: number;
   headers: { "Content-Type": "application/json"; [key: string]: string };
 }
+
+export interface RequestArg {
+  httpRequest: HttpRequest;
+}
+export type ControllerMethod = (arg: RequestArg) => Promise<HttpResponse>;

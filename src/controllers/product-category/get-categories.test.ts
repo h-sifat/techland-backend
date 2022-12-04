@@ -99,7 +99,7 @@ describe("Functionality", () => {
       );
 
       const response = await getCategories({
-        // @ts-expect-error
+        // @ts-ignore
         httpRequest: { ...validHttpRequest, query },
       });
       expect(response).toEqual({
