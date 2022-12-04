@@ -1,11 +1,11 @@
-import { makeFindProductById } from "./find-product-by-ids";
+import { makeFindProductByIds } from "./find-product-by-ids";
 
 const database = Object.freeze({
   findByIds: jest.fn(),
 });
 
 const getDatabase = jest.fn(() => database);
-const findProductById = makeFindProductById({ getDatabase });
+const findProductById = makeFindProductByIds({ getDatabase });
 
 beforeEach(() => {
   getDatabase.mockClear();

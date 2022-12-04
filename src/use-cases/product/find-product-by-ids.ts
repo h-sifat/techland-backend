@@ -6,7 +6,7 @@ export interface MakeFindProductById_Argument {
   getDatabase: GetDatabase<Pick<ProductDatabase, "findByIds">>;
 }
 
-export function makeFindProductById(
+export function makeFindProductByIds(
   factoryArg: MakeFindProductById_Argument
 ): ProductService["findProductByIds"] {
   const { getDatabase } = factoryArg;
