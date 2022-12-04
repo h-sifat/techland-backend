@@ -30,4 +30,5 @@ export interface ProductCategoryService {
     arg: ServiceArguments["editCategory"],
     options?: UseCaseOptions
   ): CategoryResponse;
+  findSubCategories: ProductCategoryDatabase["findSubCategories"];
 }

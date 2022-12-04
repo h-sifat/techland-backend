@@ -10,10 +10,11 @@ interface FormatDocumentAs {
 }
 
 export interface DBQueryMethodArgs {
-  insert: CategoryInterface;
   findAll: FormatDocumentAs;
+  insert: CategoryInterface;
   deleteById: { id: string };
   findByHash: { hash: string };
+  findSubCategories: { id: string };
   findById: { id: string } & FormatDocumentAs;
   updateById: { id: string; category: CategoryInterface };
 }
@@ -43,4 +44,9 @@ export interface ProductCategoryDatabase {
   ): Promise<Readonly<CategoryInterface> | null>;
   updateById(arg: DBQueryMethodArgs["updateById"]): Promise<void>;
   insert(arg: DBQueryMethodArgs["insert"]): Promise<void>;
+  findSubCategories(
+    arg: DBQueryMethodArgs["findSubCategories"],
+    // @TODO remove the use-case options. it doesn't belong here
+    options?: UseCaseOptions
+  ): Promise<Readonly<CategoryInterface>[]>;
 }
