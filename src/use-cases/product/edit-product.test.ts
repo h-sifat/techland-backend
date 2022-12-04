@@ -5,11 +5,13 @@ const database = Object.freeze({
   findByIds: jest.fn(),
   updateById: jest.fn(),
 });
+const getDatabase = jest.fn(() => database);
 const dbMethods = Object.freeze(Object.values(database));
 
-const editProduct = makeEditProduct({ database });
+const editProduct = makeEditProduct({ getDatabase });
 
 beforeEach(() => {
+  getDatabase.mockClear();
   dbMethods.forEach((method) => method.mockReset());
 });
 
@@ -74,5 +76,15 @@ describe("Functionality", () => {
       ...changes,
       lastModifiedAt: expect.any(Number),
     });
+  });
+
+  it(`passes the transaction to the getDatabase function`, async () => {
+    database.findByIds.mockResolvedValueOnce([sampleProduct]);
+    const id = sampleProduct._id;
+    const changes = Object.freeze({ name: "Alexa" });
+
+    const transaction: any = "wicked db transaction" + Math.random();
+    await editProduct({ id, changes }, { transaction });
+    expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });
 });

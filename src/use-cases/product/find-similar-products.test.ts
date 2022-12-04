@@ -5,11 +5,13 @@ const database = Object.freeze({
   findByIds: jest.fn(),
   findSimilarProducts: jest.fn(),
 });
+const getDatabase = jest.fn(() => database);
 const dbMethods = Object.freeze(Object.values(database));
 
-const findSimilarProducts = makeFindSimilarProducts({ database });
+const findSimilarProducts = makeFindSimilarProducts({ getDatabase });
 
 beforeEach(() => {
+  getDatabase.mockClear();
   dbMethods.forEach((method) => method.mockReset());
 });
 
@@ -59,5 +61,22 @@ describe("Functionality", () => {
       count: arg.count,
       product: fakeProduct,
     });
+  });
+
+  it(`passes the transaction to the getDatabase function`, async () => {
+    const transaction: any = "wicked db transaction" + Math.random();
+
+    const fakeProduct = Object.freeze({
+      _id: arg.id,
+      name: "Antech Power-Supply",
+    });
+    database.findByIds.mockResolvedValueOnce([fakeProduct]);
+
+    const fakeSimilarProducts = deepFreeze([{ a: 1 }, { b: 2 }]);
+    database.findSimilarProducts.mockResolvedValueOnce(fakeSimilarProducts);
+
+    await findSimilarProducts(arg, { transaction });
+
+    expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });
 });

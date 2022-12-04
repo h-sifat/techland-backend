@@ -5,11 +5,13 @@ const database = Object.freeze({
   findByIds: jest.fn(),
   deleteByIds: jest.fn(),
 });
+const getDatabase = jest.fn(() => database);
 const dbMethods = Object.freeze(Object.values(database));
 
-const deleteProduct = makeDeleteProducts({ database });
+const deleteProduct = makeDeleteProducts({ getDatabase });
 
 beforeEach(() => {
+  getDatabase.mockClear();
   dbMethods.forEach((method) => method.mockReset());
 });
 
@@ -53,5 +55,14 @@ describe("Functionality", () => {
       formatDocumentAs: "private",
     });
     expect(database.deleteByIds).toHaveBeenCalledWith({ ids: [id] });
+  });
+
+  it(`passes the transaction to the getDatabase function`, async () => {
+    database.findByIds.mockResolvedValueOnce([sampleProduct]);
+    const id = sampleProduct._id;
+
+    const transaction: any = "wicked db transaction" + Math.random();
+    await deleteProduct({ ids: [id] }, { transaction });
+    expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });
 });

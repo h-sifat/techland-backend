@@ -1,16 +1,18 @@
+import { GetDatabase } from "../interfaces";
 import type { ProductDatabase } from "../interfaces/product-db";
 import type { ProductService } from "../interfaces/product-service";
 
 export interface FactoryArgument {
-  database: Pick<ProductDatabase, "find">;
+  getDatabase: GetDatabase<Pick<ProductDatabase, "find">>;
 }
 
 export function makeListProducts(
   factoryArg: FactoryArgument
 ): ProductService["listProducts"] {
-  const { database } = factoryArg;
+  const { getDatabase } = factoryArg;
 
-  return async function listProducts(arg) {
+  return async function listProducts(arg, options = {}) {
+    const database = getDatabase({ transaction: options.transaction });
     return (await database.find(arg)) as any;
   };
 }

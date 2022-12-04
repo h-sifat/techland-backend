@@ -1,18 +1,21 @@
 import { Product } from "../../entities/product";
+import { GetDatabase } from "../interfaces";
 
 import type { ProductDatabase } from "../interfaces/product-db";
 import type { ProductService } from "../interfaces/product-service";
 
 export interface MakeAddProduct_Argument {
-  database: Pick<ProductDatabase, "insert">;
+  getDatabase: GetDatabase<Pick<ProductDatabase, "insert">>;
 }
 
 export function makeAddProduct(
   factoryArg: MakeAddProduct_Argument
 ): ProductService["addProduct"] {
-  const { database } = factoryArg;
+  const { getDatabase } = factoryArg;
 
-  return async function addProduct(arg) {
+  return async function addProduct(arg, options = {}) {
+    const database = getDatabase({ transaction: options.transaction });
+
     const { product: makeProductArg } = arg;
 
     // @TODO do not insert duplicate products

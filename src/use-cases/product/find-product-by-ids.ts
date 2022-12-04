@@ -1,16 +1,18 @@
+import { GetDatabase } from "../interfaces";
 import type { ProductDatabase } from "../interfaces/product-db";
 import type { ProductService } from "../interfaces/product-service";
 
 export interface MakeFindProductById_Argument {
-  database: Pick<ProductDatabase, "findByIds">;
+  getDatabase: GetDatabase<Pick<ProductDatabase, "findByIds">>;
 }
 
 export function makeFindProductById(
   factoryArg: MakeFindProductById_Argument
 ): ProductService["findProductByIds"] {
-  const { database } = factoryArg;
+  const { getDatabase } = factoryArg;
 
-  return async function findProductByIds(arg) {
+  return async function findProductByIds(arg, options = {}) {
+    const database = getDatabase({ transaction: options.transaction });
     const { ids, formatDocumentAs } = arg;
     return (await database.findByIds({ ids, formatDocumentAs })) as any;
   };

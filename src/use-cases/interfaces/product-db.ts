@@ -4,6 +4,7 @@ import type {
   ProductPrivateInterface,
   ProductPublicInterface,
 } from "../../entities/product/interface";
+import type { UseCaseOptions } from ".";
 import type { PaginationObject } from "../../data-access/util";
 import type { CategoryInterface } from "../../entities/product-category/interface";
 
@@ -83,7 +84,9 @@ export interface ProductDatabase {
   insert(arg: DBQueryMethodArgs["insert"]): Promise<void>;
 
   findByIds<Arg extends DBQueryMethodArgs["findByIds"]>(
-    arg: Arg
+    arg: Arg,
+    // @TODO remove this options later. it belongs to the Service
+    options?: UseCaseOptions
   ): Arg["formatDocumentAs"] extends "public"
     ? Promise<Readonly<ProductPublicInterface>[]>
     : Promise<Readonly<ProductPrivateInterface>[]>;
@@ -93,10 +96,14 @@ export interface ProductDatabase {
   updateById(arg: DBQueryMethodArgs["updateById"]): Promise<void>;
 
   find<Arg extends DBQueryMethodArgs["find"]>(
-    arg: Arg
+    arg: Arg,
+    // @TODO remove this options later. it belongs to the Service
+    options?: UseCaseOptions
   ): Promise<FindResult<Arg>>;
   searchProducts<Arg extends DBQueryMethodArgs["searchProducts"]>(
-    arg: Arg
+    arg: Arg,
+    // @TODO remove this options later. it belongs to the Service
+    options?: UseCaseOptions
   ): Promise<
     Omit<
       FindResult<
@@ -109,7 +116,9 @@ export interface ProductDatabase {
   >;
 
   getSearchSuggestions(
-    arg: DBQueryMethodArgs["getSearchSuggestions"]
+    arg: DBQueryMethodArgs["getSearchSuggestions"],
+    // @TODO remove this options later. it belongs to the Service
+    options?: UseCaseOptions
   ): Promise<GetSearchSuggestionsResult>;
 
   findSimilarProducts(

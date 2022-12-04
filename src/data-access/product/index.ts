@@ -134,7 +134,7 @@ export function makeProductDatabase(
       makeMainImageUrlGeneratorStage,
       generatedUrlFieldName: "imageUrl",
     }),
-  });
+  }) as any;
 
   return addUseTransactionAndArgsFilter<ProductDatabase>(__database__);
 }

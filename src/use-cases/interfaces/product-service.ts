@@ -2,6 +2,7 @@ import type {
   EditProduct_Changes,
   MakeProduct_Argument,
 } from "../../entities/product/make-product-entity";
+import type { UseCaseOptions } from ".";
 import type { DBQueryMethodArgs, ProductDatabase } from "./product-db";
 import type { ProductPrivateInterface } from "../../entities/product/interface";
 
@@ -17,15 +18,22 @@ export interface ProductService {
   findProductByIds: ProductDatabase["findByIds"];
   searchProducts: ProductDatabase["searchProducts"];
   getSearchSuggestions: ProductDatabase["getSearchSuggestions"];
-  addProduct(arg: ServiceArguments["addProduct"]): ProductResponse;
-  editProduct(arg: ServiceArguments["editProduct"]): ProductResponse;
+  addProduct(
+    arg: ServiceArguments["addProduct"],
+    options?: UseCaseOptions
+  ): ProductResponse;
+  editProduct(
+    arg: ServiceArguments["editProduct"],
+    options?: UseCaseOptions
+  ): ProductResponse;
 
   deleteProducts(
-    arg: DBQueryMethodArgs["deleteByIds"]
+    arg: DBQueryMethodArgs["deleteByIds"],
+    options?: UseCaseOptions
   ): Promise<ProductPrivateInterface[]>;
 
-  findSimilarProducts(arg: {
-    id: string;
-    count: number;
-  }): ReturnType<ProductDatabase["findSimilarProducts"]>;
+  findSimilarProducts(
+    arg: { id: string; count: number },
+    options?: UseCaseOptions
+  ): ReturnType<ProductDatabase["findSimilarProducts"]>;
 }

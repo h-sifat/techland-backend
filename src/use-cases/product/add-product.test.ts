@@ -4,11 +4,13 @@ import { sampleMakeProductArgument } from "../../../fixtures/product";
 const database = Object.freeze({
   insert: jest.fn(),
 });
+const getDatabase = jest.fn(() => database);
 const dbMethods = Object.freeze(Object.values(database));
 
-const addProduct = makeAddProduct({ database });
+const addProduct = makeAddProduct({ getDatabase });
 
 beforeEach(() => {
+  getDatabase.mockClear();
   dbMethods.forEach((method) => method.mockReset());
 });
 
@@ -34,5 +36,12 @@ describe("Functionality", () => {
 
     expect(database.insert).toHaveBeenCalledTimes(1);
     expect(database.insert).toHaveBeenCalledWith(product);
+  });
+
+  it(`passes the transaction to the getDatabase function`, async () => {
+    const transaction: any = "wicked db transaction" + Math.random();
+    await addProduct({ product: sampleMakeProductArgument }, { transaction });
+
+    expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });
 });

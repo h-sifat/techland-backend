@@ -1,18 +1,20 @@
 import { EPP } from "../../common/util/epp";
 import { Product } from "../../entities/product";
+import { GetDatabase } from "../interfaces";
 
 import type { ProductDatabase } from "../interfaces/product-db";
 import type { ProductService } from "../interfaces/product-service";
 
 export interface MakeEditProduct_Argument {
-  database: Pick<ProductDatabase, "findByIds" | "updateById">;
+  getDatabase: GetDatabase<Pick<ProductDatabase, "findByIds" | "updateById">>;
 }
 export function makeEditProduct(
   factoryArg: MakeEditProduct_Argument
 ): ProductService["editProduct"] {
-  const { database } = factoryArg;
+  const { getDatabase } = factoryArg;
 
-  return async function editProduct(arg) {
+  return async function editProduct(arg, options = {}) {
+    const database = getDatabase({ transaction: options.transaction });
     const { id, changes } = arg;
 
     const products = await database.findByIds({
