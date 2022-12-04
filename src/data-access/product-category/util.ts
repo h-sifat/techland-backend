@@ -27,7 +27,7 @@ export function makeCategoryProjectStages(
   });
 
   const concatImageUrlPrefixWithImageId = Object.freeze({
-    $concat: [imageUrlPrefix, "imageId"],
+    $concat: [imageUrlPrefix, "$imageId"],
   });
 
   const projectStages: CategoryProjectStages = deepFreeze({

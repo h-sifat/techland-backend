@@ -14,7 +14,7 @@ export interface DBQueryMethodArgs {
   insert: CategoryInterface;
   deleteById: { id: string };
   findByHash: { hash: string };
-  findSubCategories: { id: string };
+  findSubCategories: { id: string } & FormatDocumentAs;
   findById: { id: string } & FormatDocumentAs;
   updateById: { id: string; category: CategoryInterface };
 }

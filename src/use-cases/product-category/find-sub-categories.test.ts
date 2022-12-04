@@ -21,12 +21,15 @@ describe("Functionality", () => {
     });
     database.findSubCategories.mockResolvedValueOnce(fakeResponse);
 
-    const id = "abc";
-    const response = await findSubCategories({ id });
+    const arg = Object.freeze({
+      id: "abc",
+      formatDocumentAs: "public",
+    } as const);
+    const response = await findSubCategories(arg);
     expect(response).toEqual(fakeResponse);
 
     expect(database.findSubCategories).toHaveBeenCalledTimes(1);
-    expect(database.findSubCategories).toHaveBeenCalledWith({ id });
+    expect(database.findSubCategories).toHaveBeenCalledWith(arg);
   });
 
   it(`passes the transaction to the getDatabase function`, async () => {
@@ -38,8 +41,11 @@ describe("Functionality", () => {
     });
     database.findSubCategories.mockResolvedValueOnce(fakeResponse);
 
-    const id = "abc";
-    await findSubCategories({ id }, { transaction });
+    const arg = Object.freeze({
+      id: "abc",
+      formatDocumentAs: "public",
+    } as const);
+    await findSubCategories(arg, { transaction });
 
     expect(getDatabase).toHaveBeenCalledWith({ transaction });
   });

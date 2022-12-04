@@ -14,7 +14,7 @@ export function makeFindSubCategories(
   return async function findSubCategories(arg, options = {}) {
     const database = getDatabase({ transaction: options.transaction });
 
-    const { id } = arg;
-    return await database.findSubCategories({ id });
+    const { id, formatDocumentAs } = arg;
+    return await database.findSubCategories({ id, formatDocumentAs });
   };
 }
