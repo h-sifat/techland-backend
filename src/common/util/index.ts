@@ -11,3 +11,26 @@ export const makeId: MakeId = () => cuid();
 export function currentTimeMs() {
   return Date.now();
 }
+
+export interface MakeUrl_Argument {
+  host: string;
+  protocol: string;
+  searchParams?: Record<string, string>;
+  auth?: { password: string; username: string };
+}
+
+export function makeUrl(arg: MakeUrl_Argument) {
+  const { protocol, host, auth, searchParams } = arg;
+
+  let url = `${protocol}://`;
+
+  if (auth)
+    url +=
+      [auth.username, auth.password].map(encodeURIComponent).join(":") + "@";
+
+  url += host;
+
+  if (searchParams) url += "?" + new URLSearchParams(searchParams).toString();
+
+  return url;
+}
