@@ -1,5 +1,11 @@
+import {
+  parseQuery,
+  makeExpressRequestHandler,
+  makeExpressQueryParserMiddleware,
+} from "./util";
+import { pick } from "lodash";
 import { deepFreeze } from "../common/util/deep-freeze";
-import { makeExpressQueryParserMiddleware, parseQuery } from "./util";
+import type { HttpResponse } from "../controllers/interface";
 
 describe("parseQuery", () => {
   it(`parses a base64 encoded json object`, () => {
@@ -102,5 +108,99 @@ describe("makeExpressQueryParserMiddleware", () => {
 
     expect(res.status).not.toHaveBeenCalled();
     expect(res.json).not.toHaveBeenCalled();
+  });
+});
+
+describe("makeExpressRequestHandler", () => {
+  const controller = jest.fn();
+  const next = jest.fn();
+  const debug = jest.fn();
+  const res = Object.freeze({
+    set: jest.fn(),
+    json: jest.fn(),
+    status: jest.fn(),
+  });
+  const req = Object.freeze({
+    ip: "a",
+    params: {},
+    method: "get",
+    set: jest.fn(),
+    get: jest.fn(),
+    query: { a: 1 },
+    path: "/products",
+    body: { name: "a" },
+  });
+
+  beforeEach(() => {
+    [debug, next, req.get, req.set, controller].forEach((method: any) =>
+      method.mockReset()
+    );
+    Object.values(res).forEach((method) => method.mockReset());
+
+    // return random header value
+    req.get.mockImplementation(() => Math.random().toString());
+  });
+
+  const requestHandler = makeExpressRequestHandler({ controller, debug });
+
+  it(`sends the httpResponse from the controller`, async () => {
+    const fakeControllerResponse: HttpResponse = deepFreeze({
+      statusCode: 200,
+      body: { success: true, data: { a: 1 } },
+      headers: { "Content-Type": "application/json" },
+    });
+    controller.mockResolvedValueOnce(fakeControllerResponse);
+
+    await requestHandler(<any>req, <any>res, next);
+
+    expect(controller).toHaveBeenCalledWith({
+      httpRequest: {
+        ...pick(req, ["ip", "body", "path", "query", "params", "method"]),
+        headers: {
+          Referer: expect.any(String),
+          "User-Agent": expect.any(String),
+          "Content-Type": expect.any(String),
+        },
+      },
+    });
+
+    [next, debug].forEach((method: any) => {
+      expect(method).not.toHaveBeenCalled();
+    });
+
+    [res.set, res.status, res.json].forEach((method) => {
+      expect(method).toHaveBeenCalledTimes(1);
+    });
+
+    // to get the headers
+    expect(req.get).toHaveBeenCalledTimes(3);
+
+    expect(res.set).toHaveBeenCalledWith(fakeControllerResponse.headers);
+    expect(res.json).toHaveBeenCalledWith(fakeControllerResponse.body);
+    expect(res.status).toHaveBeenCalledWith(fakeControllerResponse.statusCode);
+  });
+
+  it(`sends error response if controller throws an error`, async () => {
+    const error = new Error("couldn't connect to db");
+    controller.mockRejectedValueOnce(error);
+
+    await requestHandler(<any>req, <any>res, next);
+
+    [next, res.set].forEach((method: any) => {
+      expect(method).not.toHaveBeenCalled();
+    });
+
+    [res.status, res.json, debug].forEach((method) => {
+      expect(method).toHaveBeenCalledTimes(1);
+    });
+
+    expect(debug).toHaveBeenCalledWith(error);
+
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      errorType: "msgAndCode",
+      error: { message: expect.any(String) },
+    });
+    expect(res.status).toHaveBeenCalledWith(500);
   });
 });
