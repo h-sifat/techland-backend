@@ -32,6 +32,7 @@ interface Config {
 
   PORT: string;
   API_ROOT: string;
+  QUERY_FIELD_NAME: string;
 }
 
 const config: Config = Object.seal({
@@ -54,6 +55,7 @@ const config: Config = Object.seal({
   MAX_SEARCH_QUERY_LENGTH: 150,
 
   PORT: "",
+  QUERY_FIELD_NAME: "q",
   API_ROOT: "api-v1-0-0",
 });
 
@@ -117,5 +119,5 @@ export const PRODUCT_GET_CONTROLLER_DEFAULT_CONFIG = Object.freeze({
 
 export const DEFAULT_DB_OPTIONS = Object.freeze({
   w: "majority",
-  readConcernLevel: "majority",
+  readConcernLevel: "local",
 } as const);
