@@ -15,6 +15,7 @@ import type { ClientSession } from "mongodb";
 import { MongoClient } from "mongodb";
 import { makeUrl, MakeUrl_Argument } from "../common/util";
 import { deepFreeze } from "../common/util/deep-freeze";
+import { DEFAULT_DB_OPTIONS } from "../config";
 
 export interface PaginationObject {
   pageNumber: number;
@@ -125,11 +126,6 @@ export const DocumentFormatSchema = z
 export interface QueryMethodOptions {
   session?: ClientSession;
 }
-
-const DEFAULT_DB_OPTIONS = Object.freeze({
-  w: "majority",
-  readConcernLevel: "majority",
-});
 
 export type MakeDatabase_Argument = {
   protocol?: string;
