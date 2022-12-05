@@ -397,7 +397,7 @@ describe("getSearchSuggestions", () => {
 });
 
 describe("findSimilarProducts", () => {
-  it(`returns similar products for the given id`, (done) => {
+  it(`returns similar products for the given id`, async () => {
     const fakeProducts = deepFreeze([{ a: 1 }, { b: 2 }]);
     ProductService.findSimilarProducts.mockResolvedValueOnce(fakeProducts);
 
@@ -405,46 +405,28 @@ describe("findSimilarProducts", () => {
       httpRequest: { ...validHttpRequest, query: validQueryDataset.similar },
     });
 
-    const withTransactionCallbackArg = deepFreeze({
-      transaction: "a pain in the neck",
+    const response = await getProducts(arg);
+
+    expect(response).toEqual({
+      statusCode: 200,
+      body: { success: true, data: fakeProducts },
+      headers: { "Content-Type": "application/json" },
     });
 
-    getProducts(arg)
-      .then((response) => {
-        try {
-          expect(response).toEqual({
-            statusCode: 200,
-            body: { success: true, data: fakeProducts },
-            headers: { "Content-Type": "application/json" },
-          });
+    expect(ProductService.findSimilarProducts).toHaveBeenCalledTimes(1);
+    expect(ProductService.findSimilarProducts).toHaveBeenCalledWith({
+      id: arg.httpRequest.query.id,
+      count: arg.httpRequest.query.count,
+    });
 
-          expect(ProductService.findSimilarProducts).toHaveBeenCalledTimes(1);
-          expect(ProductService.findSimilarProducts).toHaveBeenCalledWith(
-            {
-              id: arg.httpRequest.query.id,
-              count: arg.httpRequest.query.count,
-            },
-            { transaction: withTransactionCallbackArg.transaction }
-          );
+    Object.values(ProductService).forEach((service) => {
+      if (service !== ProductService.findSimilarProducts)
+        expect(service).not.toHaveBeenCalled();
+    });
 
-          Object.values(ProductService).forEach((service) => {
-            if (service !== ProductService.findSimilarProducts)
-              expect(service).not.toHaveBeenCalled();
-          });
-
-          Object.values(CategoryService).forEach((service) => {
-            expect(service).not.toHaveBeenCalled();
-          });
-
-          done();
-        } catch (ex) {
-          done(ex);
-        }
-      })
-      .catch(done);
-
-    const transactionCallback = WithTransaction.mock.calls[0][0];
-    transactionCallback(withTransactionCallbackArg);
+    Object.values(CategoryService).forEach((service) => {
+      expect(service).not.toHaveBeenCalled();
+    });
   });
 });
 

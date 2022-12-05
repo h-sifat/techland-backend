@@ -193,7 +193,7 @@ export function makeGetProducts(
           });
           break;
         case "similar":
-          result = await findSimilarProducts({
+          result = await ProductService.findSimilarProducts({
             id: query.id,
             count: query.count,
           });
@@ -217,24 +217,6 @@ export function makeGetProducts(
       };
     }
   };
-
-  async function findSimilarProducts(
-    arg: z.infer<typeof SimilarProductsQuerySchema>
-  ) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await WithTransaction(async ({ transaction }) => {
-          const similarProducts = ProductService.findSimilarProducts(
-            { id: arg.id, count: arg.count },
-            { transaction }
-          );
-          resolve(similarProducts);
-        });
-      } catch (ex) {
-        reject(ex);
-      }
-    });
-  }
 
   async function listProducts(
     arg: z.infer<typeof ListQuerySchema> & FormatDocumentAs
