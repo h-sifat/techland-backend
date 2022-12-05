@@ -6,11 +6,14 @@ import { z } from "zod";
 
 import type {
   WithTransaction,
-  MakeWithTransaction_Argument,
-  CustomTransaction,
   MakeDatabaseType,
+  CustomTransaction,
+  MakeWithTransaction_Argument,
 } from "./interface";
 import type { ClientSession } from "mongodb";
+
+import { MongoClient } from "mongodb";
+import { makeUrl, MakeUrl_Argument } from "../common/util";
 import { deepFreeze } from "../common/util/deep-freeze";
 
 export interface PaginationObject {
@@ -121,4 +124,34 @@ export const DocumentFormatSchema = z
 
 export interface QueryMethodOptions {
   session?: ClientSession;
+}
+
+const DEFAULT_DB_OPTIONS = Object.freeze({
+  w: "majority",
+  readConcernLevel: "majority",
+});
+
+export type MakeDatabase_Argument = {
+  protocol?: string;
+  options?: { w: string; readConcernLevel: string };
+} & Pick<MakeUrl_Argument, "host" | "auth">;
+
+export async function makeDatabaseClient(
+  factoryArg: MakeDatabase_Argument
+): Promise<MongoClient> {
+  const {
+    auth,
+    host,
+    protocol = "mongodb+srv",
+    options = DEFAULT_DB_OPTIONS,
+  } = factoryArg;
+
+  const dbUrl = makeUrl({ host, protocol, auth, searchParams: options });
+  const client = new MongoClient(dbUrl);
+
+  await client.connect();
+  // making sure that client is connected to db
+  await client.db("admin").command({ ping: 1 });
+
+  return client;
 }
