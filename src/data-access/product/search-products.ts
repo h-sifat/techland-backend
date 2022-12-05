@@ -57,9 +57,10 @@ export function makeSearchProducts(factoryArg: MakeSearchProducts_Argument) {
       _id: 1,
       name: 1,
       price: 1,
-      imageUrl: 1,
       priceUnit: 1,
       shortDescriptions: 1,
+      [generatedUrlName]: 1,
+      images: 1, // allow temporarily to generate main "imageUrl", remove later with a project stage
     } as const);
 
   const projectStages: {

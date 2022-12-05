@@ -281,6 +281,8 @@ describe("makeAggregationPipelineToGetProducts", () => {
                 _id: 1,
                 name: 1,
                 price: 1,
+                brand: 1,
+                imageUrl: 1,
                 priceUnit: 1,
                 shortDescriptions: 1,
               },

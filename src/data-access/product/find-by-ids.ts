@@ -32,10 +32,22 @@ export const findByIdsProjectObjects = deepFreeze({
 } as const);
 
 export interface MakeFindByIds_Argument {
+  imageUrlPrefix: string;
   collection: Pick<Collection, "aggregate">;
 }
 export function makeFindByIds(factoryArg: MakeFindByIds_Argument) {
-  const { collection } = factoryArg;
+  const { collection, imageUrlPrefix } = factoryArg;
+
+  const imageIdToUrlMapper = deepFreeze({
+    $map: {
+      input: "$images",
+      as: "image",
+      in: {
+        isMain: "$$image.isMain",
+        url: { $concat: [imageUrlPrefix, "$$image.id"] },
+      },
+    },
+  });
 
   return async function findByIds(
     arg: DBQueryMethodArgs["findByIds"],
@@ -46,7 +58,12 @@ export function makeFindByIds(factoryArg: MakeFindByIds_Argument) {
     const aggregateArgs: [any, any] = [
       [
         { $match: { _id: { $in: ids } } },
-        { $project: findByIdsProjectObjects[formatDocumentAs] },
+        {
+          $project: {
+            ...findByIdsProjectObjects[formatDocumentAs], // don't change order
+            images: imageIdToUrlMapper,
+          },
+        },
       ],
       options,
     ];

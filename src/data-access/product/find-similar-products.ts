@@ -63,6 +63,7 @@ export function makeFindSimilarProducts(
           price: 1,
           priceUnit: 1,
           score: { $meta: "searchScore" },
+          images: 1, // allowing temporarily to generate imageUrl
         },
       },
       { $sort: { score: -1 } },

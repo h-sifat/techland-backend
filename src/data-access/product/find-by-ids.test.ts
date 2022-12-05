@@ -3,8 +3,12 @@ import { findByIdsProjectObjects, makeFindByIds } from "./find-by-ids";
 const toArray = jest.fn();
 const aggregate = jest.fn(() => Object.freeze({ toArray }));
 const collection = Object.freeze({ aggregate });
+const imageUrlPrefix = "https://a.com/images/";
 
-const findByIds = makeFindByIds({ collection: <any>collection });
+const findByIds = makeFindByIds({
+  imageUrlPrefix,
+  collection: <any>collection,
+});
 
 beforeEach(() => {
   toArray.mockClear();
@@ -27,7 +31,12 @@ describe("Functionality", () => {
       expect(aggregate).toHaveBeenCalledWith(
         [
           { $match: { _id: { $in: ids } } },
-          { $project: findByIdsProjectObjects[formatDocumentAs] },
+          {
+            $project: {
+              ...findByIdsProjectObjects[formatDocumentAs],
+              images: expect.any(Object), // remap url stage
+            },
+          },
         ],
         {}
       );
@@ -46,7 +55,12 @@ describe("Functionality", () => {
     expect(aggregate).toHaveBeenCalledWith(
       [
         { $match: { _id: { $in: ids } } },
-        { $project: findByIdsProjectObjects[formatDocumentAs] },
+        {
+          $project: {
+            ...findByIdsProjectObjects[formatDocumentAs],
+            images: expect.any(Object), // remap url stage
+          },
+        },
       ],
       { session }
     );

@@ -33,6 +33,8 @@ export const makeFindArgsPartial = (() => {
     "_id",
     "name",
     "price",
+    "brand",
+    "imageUrl",
     "priceUnit",
     "shortDescriptions",
   ];
@@ -88,9 +90,9 @@ export function makeProductDatabase(
 
   const __database__: ProductDatabase = Object.freeze({
     insert: makeInsert({ collection }),
-    findByIds: makeFindByIds({ collection }),
     updateById: makeUpdateById({ collection }),
     deleteByIds: makeDeleteByIds({ collection }),
+    findByIds: makeFindByIds({ collection, imageUrlPrefix }),
 
     find: makeFind({
       collection,
