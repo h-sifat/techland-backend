@@ -5,6 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
+    "start": "pm2 start dist/src/index.js -i max",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test:watch": "jest --watch",
@@ -37,6 +38,7 @@
     "isomorphic-dompurify": "^0.24.0",
     "lodash": "^4.17.21",
     "mongodb": "^4.12.1",
+    "pm2": "^5.2.2",
     "zod": "^3.19.1"
   }
 }
