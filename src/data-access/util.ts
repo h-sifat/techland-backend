@@ -54,14 +54,14 @@ export function makeTransactionalDatabaseProxy<DB extends object>(
 ): DB {
   const { database, transaction } = factoryArg;
 
-  return new Proxy(database, {
-    get(target, property, receiver) {
-      if (typeof (<any>target)[property] === "function") {
-        return (arg: any) =>
-          // Here we're are injecting the transaction session
-          (<any>target)[property](arg, { session: transaction.session });
-      }
-      return Reflect.get(target, property, receiver);
+  return new Proxy({} as any, {
+    get(_, property, receiver) {
+      if (typeof (<any>database)[property] !== "function")
+        return Reflect.get(database, property, receiver);
+
+      // Here we're are injecting the transaction session
+      return (arg: any) =>
+        (<any>database)[property](arg, { session: transaction.session });
     },
   });
 }
