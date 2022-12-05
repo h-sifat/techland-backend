@@ -1,6 +1,8 @@
 import type { Express as ExpressServer } from "express";
 
+import helmet from "helmet";
 import express from "express";
+import compression from "compression";
 import { makeExpressQueryParserMiddleware, parseQuery } from "./util";
 
 export interface MakeServer_Argument {
@@ -22,9 +24,14 @@ export function makeServer(factoryArg: MakeServer_Argument): ExpressServer {
 
   const server = express();
 
+  server.use(helmet());
+  server.use(compression());
+
   server.use(express.json());
   server.use(express.query({ strictNullHandling: true }));
   server.use(`/${apiRoot}`, urlEncodedBase64QueryStringParser);
+
+  server.disable("x-powered-by");
 
   return server;
 }
