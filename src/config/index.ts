@@ -11,6 +11,7 @@ interface EntityConfig {
 }
 
 interface Config {
+  [key: string]: number | string;
   BCRYPT_SALT_ROUNDS: number;
 
   // Database
@@ -29,10 +30,11 @@ interface Config {
   MAX_SEARCH_SUGGESTIONS: number;
   MAX_SEARCH_QUERY_LENGTH: number;
 
+  PORT: string;
   API_ROOT: string;
 }
 
-const config: Config = {
+const config: Config = Object.seal({
   BCRYPT_SALT_ROUNDS: 10,
 
   DB_NAME: "",
@@ -51,8 +53,14 @@ const config: Config = {
   MAX_SEARCH_SUGGESTIONS: 10,
   MAX_SEARCH_QUERY_LENGTH: 150,
 
+  PORT: "",
   API_ROOT: "api-v1-0-0",
-};
+});
+
+export function modifyConfig(arg: { changes: Partial<Config> }) {
+  for (const [key, value] of Object.entries(arg.changes))
+    if (key in config) config[key] = value as any;
+}
 
 export function getConfig(): Readonly<Config> {
   return Object.freeze({ ...config });
