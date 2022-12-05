@@ -1,0 +1,81 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "brand.name": { "type": "string", "analyzer": "lucene.keyword" },
+      "categoryId": { "type": "string", "analyzer": "lucene.keyword" },
+      "name": [
+        {
+          "type": "autocomplete",
+          "foldDiacritics": false,
+          "tokenization": "edgeGram",
+          "analyzer": "lucene.standard"
+        },
+        { "type": "string", "analyzer": "lucene.standard" }
+      ],
+      "description": {
+        "type": "string",
+        "analyzer": "productDescriptionAnalyzer"
+      },
+      "shortDescriptions": { "type": "string", "analyzer": "lucene.standard" },
+      "specifications": { "dynamic": true, "type": "document" }
+    }
+  },
+  "analyzers": [
+    {
+      "name": "productDescriptionAnalyzer",
+      "charFilters": [{ "type": "htmlStrip" }],
+      "tokenizer": { "type": "standard" },
+      "tokenFilters": [
+        { "type": "lowercase" },
+        { "type": "snowballStemming", "stemmerName": "english" },
+        {
+          "type": "stopword",
+          "tokens": [
+            "a",
+            "i",
+            "am",
+            "an",
+            "as",
+            "at",
+            "be",
+            "by",
+            "do",
+            "he",
+            "if",
+            "in",
+            "is",
+            "it",
+            "me",
+            "no",
+            "of",
+            "on",
+            "or",
+            "so",
+            "to",
+            "up",
+            "we",
+            "all",
+            "and",
+            "are",
+            "for",
+            "has",
+            "her",
+            "his",
+            "off",
+            "our",
+            "out",
+            "the",
+            "you",
+            "over",
+            "that",
+            "this",
+            "with",
+            "your",
+            "other"
+          ]
+        }
+      ]
+    }
+  ]
+}
