@@ -1,5 +1,6 @@
 dist/
 trash/
+public/
 coverage/
 node_modules/
 

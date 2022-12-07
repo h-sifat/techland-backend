@@ -6,6 +6,8 @@ import { makeControllers } from "./controllers";
 import { makeDebugger } from "./common/util/debug";
 import { notFound } from "./controllers/not-found";
 import { makeExpressRequestHandler } from "./server/util";
+import express from "express";
+import path from "path";
 
 const config = getConfig();
 
@@ -17,6 +19,9 @@ const server = makeServer({
 async function initApplication() {
   const debug = makeDebugger({ namespace: "request-handler" });
   const controllers = await makeControllers();
+
+  server.use("/images", express.static(config.IMAGES_DIRECTORY));
+  server.use(express.static(config.FILES_DIRECTORY));
 
   server.get(
     `/${config.API_ROOT}/products`,

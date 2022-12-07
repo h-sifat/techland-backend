@@ -11,6 +11,8 @@ const variables = Object.freeze([
   "IMAGE_URL_PREFIX",
   "PRODUCTS_COL_NAME",
   "PRODUCT_CATEGORIES_COL_NAME",
+  "IMAGES_DIRECTORY",
+  "FILES_DIRECTORY",
 ] as const);
 
 const changes = variables.reduce((changes, variable) => {

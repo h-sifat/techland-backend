@@ -33,6 +33,9 @@ interface Config {
   PORT: string;
   API_ROOT: string;
   QUERY_FIELD_NAME: string;
+
+  IMAGES_DIRECTORY: string;
+  FILES_DIRECTORY: string;
 }
 
 const config: Config = Object.seal({
@@ -56,7 +59,10 @@ const config: Config = Object.seal({
 
   PORT: "",
   QUERY_FIELD_NAME: "q",
-  API_ROOT: "api-v1-0-0",
+  API_ROOT: "api-v0-1-0",
+
+  IMAGES_DIRECTORY: "",
+  FILES_DIRECTORY: "",
 });
 
 export function modifyConfig(arg: { changes: Partial<Config> }) {
