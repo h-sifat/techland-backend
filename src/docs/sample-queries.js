@@ -29,6 +29,13 @@ const allQueries = Object.freeze({
 
     {
       qType: "list",
+      categoryId: mouseCategoryId,
+      priceRange: { min: 100, max: 1000 },
+      pagination: { pageNumber: 2, itemsPerPage: 5 },
+    },
+
+    {
+      qType: "list",
       brandIds: [amdBrandId],
       pagination: { pageNumber: 2, itemsPerPage: 5 },
     },
@@ -46,7 +53,7 @@ const allQueries = Object.freeze({
   ]),
 });
 
-const prefix = "localhost:3000/api-v1-0-0/";
+const prefix = "localhost:3000/api-v0-1-0/";
 
 Object.entries(allQueries).forEach(([name, queryArray]) => {
   console.log(`------${name}---------`);
@@ -59,43 +66,50 @@ Object.entries(allQueries).forEach(([name, queryArray]) => {
 /*
 ------categories---------
 { lookup: 'all' }
-localhost:3000/api-v1-0-0/categories/?q=eyJsb29rdXAiOiJhbGwifQ%3D%3D
+localhost:3000/api-v0-1-0/categories/?q=eyJsb29rdXAiOiJhbGwifQ%3D%3D
 { lookup: 'sub', id: 'clbarq9kv001ucipjh03db42z' }
-localhost:3000/api-v1-0-0/categories/?q=eyJsb29rdXAiOiJzdWIiLCJpZCI6ImNsYmFycTlrdjAwMXVjaXBqaDAzZGI0MnoifQ%3D%3D
+localhost:3000/api-v0-1-0/categories/?q=eyJsb29rdXAiOiJzdWIiLCJpZCI6ImNsYmFycTlrdjAwMXVjaXBqaDAzZGI0MnoifQ%3D%3D
 { lookup: 'self', id: 'clbarq9jg001hcipj67nxg29b' }
-localhost:3000/api-v1-0-0/categories/?q=eyJsb29rdXAiOiJzZWxmIiwiaWQiOiJjbGJhcnE5amcwMDFoY2lwajY3bnhnMjliIn0%3D
+localhost:3000/api-v0-1-0/categories/?q=eyJsb29rdXAiOiJzZWxmIiwiaWQiOiJjbGJhcnE5amcwMDFoY2lwajY3bnhnMjliIn0%3D
 ------products---------
 { qType: 'list' }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6Imxpc3QifQ%3D%3D
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6Imxpc3QifQ%3D%3D
 { qType: 'list', pagination: { pageNumber: 2, itemsPerPage: 5 } }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJwYWdpbmF0aW9uIjp7InBhZ2VOdW1iZXIiOjIsIml0ZW1zUGVyUGFnZSI6NX19
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJwYWdpbmF0aW9uIjp7InBhZ2VOdW1iZXIiOjIsIml0ZW1zUGVyUGFnZSI6NX19
 { qType: 'list', sortBy: { price: '-1' } }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJzb3J0QnkiOnsicHJpY2UiOiItMSJ9fQ%3D%3D
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJzb3J0QnkiOnsicHJpY2UiOiItMSJ9fQ%3D%3D
 {
   qType: 'list',
   categoryId: 'clbarq9jg001hcipj67nxg29b',
   pagination: { pageNumber: 2, itemsPerPage: 5 }
 }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJjYXRlZ29yeUlkIjoiY2xiYXJxOWpnMDAxaGNpcGo2N254ZzI5YiIsInBhZ2luYXRpb24iOnsicGFnZU51bWJlciI6MiwiaXRlbXNQZXJQYWdlIjo1fX0%3D
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJjYXRlZ29yeUlkIjoiY2xiYXJxOWpnMDAxaGNpcGo2N254ZzI5YiIsInBhZ2luYXRpb24iOnsicGFnZU51bWJlciI6MiwiaXRlbXNQZXJQYWdlIjo1fX0%3D
+{
+  qType: 'list',
+  categoryId: 'clbarq9jg001hcipj67nxg29b',
+  priceRange: { min: 100, max: 1000 },
+  pagination: { pageNumber: 2, itemsPerPage: 5 }
+}
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJjYXRlZ29yeUlkIjoiY2xiYXJxOWpnMDAxaGNpcGo2N254ZzI5YiIsInByaWNlUmFuZ2UiOnsibWluIjoxMDAsIm1heCI6MTAwMH0sInBhZ2luYXRpb24iOnsicGFnZU51bWJlciI6MiwiaXRlbXNQZXJQYWdlIjo1fX0%3D
 {
   qType: 'list',
   brandIds: [ 'bw18cj2o' ],
   pagination: { pageNumber: 2, itemsPerPage: 5 }
 }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJicmFuZElkcyI6WyJidzE4Y2oybyJdLCJwYWdpbmF0aW9uIjp7InBhZ2VOdW1iZXIiOjIsIml0ZW1zUGVyUGFnZSI6NX19
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6Imxpc3QiLCJicmFuZElkcyI6WyJidzE4Y2oybyJdLCJwYWdpbmF0aW9uIjp7InBhZ2VOdW1iZXIiOjIsIml0ZW1zUGVyUGFnZSI6NX19
 {
   qType: 'search',
   query: 'Keychron',
   pagination: { pageNumber: 2, itemsPerPage: 5 }
 }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6InNlYXJjaCIsInF1ZXJ5IjoiS2V5Y2hyb24iLCJwYWdpbmF0aW9uIjp7InBhZ2VOdW1iZXIiOjIsIml0ZW1zUGVyUGFnZSI6NX19
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6InNlYXJjaCIsInF1ZXJ5IjoiS2V5Y2hyb24iLCJwYWdpbmF0aW9uIjp7InBhZ2VOdW1iZXIiOjIsIml0ZW1zUGVyUGFnZSI6NX19
 { qType: 'suggestions', query: 'Keych', count: 5 }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6InN1Z2dlc3Rpb25zIiwicXVlcnkiOiJLZXljaCIsImNvdW50Ijo1fQ%3D%3D
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6InN1Z2dlc3Rpb25zIiwicXVlcnkiOiJLZXljaCIsImNvdW50Ijo1fQ%3D%3D
 { qType: 'similar', id: 'clafgf2no00hui0pjhni8am1y', count: 5 }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6InNpbWlsYXIiLCJpZCI6ImNsYWZnZjJubzAwaHVpMHBqaG5pOGFtMXkiLCJjb3VudCI6NX0%3D
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6InNpbWlsYXIiLCJpZCI6ImNsYWZnZjJubzAwaHVpMHBqaG5pOGFtMXkiLCJjb3VudCI6NX0%3D
 {
   qType: 'byIds',
   ids: [ 'clafgf2no00hvi0pj5pe79l86', 'clafgf2no00i8i0pjhs7nc5ju' ]
 }
-localhost:3000/api-v1-0-0/products/?q=eyJxVHlwZSI6ImJ5SWRzIiwiaWRzIjpbImNsYWZnZjJubzAwaHZpMHBqNXBlNzlsODYiLCJjbGFmZ2Yybm8wMGk4aTBwamhzN25jNWp1Il19
+localhost:3000/api-v0-1-0/products/?q=eyJxVHlwZSI6ImJ5SWRzIiwiaWRzIjpbImNsYWZnZjJubzAwaHZpMHBqNXBlNzlsODYiLCJjbGFmZ2Yybm8wMGk4aTBwamhzN25jNWp1Il19
 */

@@ -1,5 +1,6 @@
 import type { Express as ExpressServer } from "express";
 
+import cors from "cors";
 import helmet from "helmet";
 import express from "express";
 import compression from "compression";
@@ -24,7 +25,22 @@ export function makeServer(factoryArg: MakeServer_Argument): ExpressServer {
 
   const server = express();
 
-  server.use(helmet());
+  server.use(cors());
+
+  server.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          imgSrc: ["*", "data:"],
+          connectSrc: ["'self'", "*"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["*", "'self'", "'unsafe-inline'"],
+          frameSrc: ["'self'", "*"],
+        },
+      },
+    })
+  );
   server.use(compression());
 
   server.use(express.json());

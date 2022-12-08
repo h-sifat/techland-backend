@@ -1,13 +1,12 @@
 import "./set-env"; // @WARNING this line must be at the top
 
+import express from "express";
 import { getConfig } from "./config";
 import { makeServer } from "./server";
 import { makeControllers } from "./controllers";
 import { makeDebugger } from "./common/util/debug";
 import { notFound } from "./controllers/not-found";
 import { makeExpressRequestHandler } from "./server/util";
-import express from "express";
-import path from "path";
 
 const config = getConfig();
 
