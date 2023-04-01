@@ -1,11 +1,11 @@
 import "./set-env"; // @WARNING this line must be at the top
 
+import path from "path";
 import express from "express";
 import { getConfig } from "./config";
 import { makeServer } from "./server";
 import { makeControllers } from "./controllers";
 import { makeDebugger } from "./common/util/debug";
-import { notFound } from "./controllers/not-found";
 import { makeExpressRequestHandler } from "./server/util";
 
 const config = getConfig();
@@ -38,7 +38,11 @@ async function initApplication() {
     })
   );
 
-  server.use(makeExpressRequestHandler({ controller: notFound }));
+  server.use((_, res) => {
+    // if an unknown route is found then redirect to the home page.
+    // The frontend will take care of showing a "Not Found" error.
+    res.sendFile(path.join(config.FILES_DIRECTORY, "index.html"));
+  });
 
   server.listen(config.PORT, () => {
     console.log(`Server running on port: ${config.PORT}`);

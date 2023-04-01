@@ -1,3 +1,4 @@
+import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -19,6 +20,9 @@ const changes = variables.reduce((changes, variable) => {
   changes[variable] = process.env[variable]!;
   return changes;
 }, {} as Record<string, string>);
+
+for (const dirName of ["IMAGES_DIRECTORY", "FILES_DIRECTORY"])
+  changes[dirName] = path.resolve(changes[dirName]);
 
 import { modifyConfig } from "./config";
 modifyConfig({ changes });
