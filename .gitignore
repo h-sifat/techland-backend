@@ -7,4 +7,7 @@ node_modules/
 trash.*
 *.env
 app.yaml
+fly.toml
 .gcloudignore
+Dockerfile
+.dockerignore
